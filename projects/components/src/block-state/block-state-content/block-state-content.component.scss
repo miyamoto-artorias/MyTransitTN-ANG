@@ -1,0 +1,9 @@
+:host {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--text-neutral-600);
+}
+
+:host-context(html.dark) {
+  color: var(--text-neutral-500);
+}

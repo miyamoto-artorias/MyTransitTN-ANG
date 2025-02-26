@@ -1,0 +1,256 @@
+@if (_isServer) {
+  <ng-content/>
+}
+
+<ng-template #itemsTpl let-items>
+  <div class="group">
+    @for (item of items; track item; let index = $index) {
+      @if (_isGroup(item)) {
+        <div class="flex items-center group-operations">
+          <div class="remove" (click)="removeCondition(index, items)">
+            <mat-icon class="font-icon">close</mat-icon>
+          </div>
+          <button [matMenuTriggerFor]="nestedGroupOperationsMenu" class="group-operation">
+            {{ getSelectedGroupOperationName(item) }}
+          </button>
+          <div [matMenuTriggerFor]="addGroupMenu" class="add">
+            <mat-icon class="font-icon">add</mat-icon>
+          </div>
+          <mat-menu #nestedGroupOperationsMenu>
+            <div emrMenuOptionGroup [(ngModel)]="item['logicalOperator']">
+              @for (groupOperation of groupOperations(); track groupOperation.id) {
+                <mat-option [value]="groupOperation.id">{{ groupOperation.name }}</mat-option>
+              }
+            </div>
+          </mat-menu>
+          <mat-menu #addGroupMenu>
+            <button mat-menu-item (click)="addCondition(item)">Add Condition</button>
+            <button mat-menu-item (click)="addGroup(item)">Add Group</button>
+          </mat-menu>
+        </div>
+        @if (item['value'].length > 0) {
+          <ng-container [ngTemplateOutlet]="itemsTpl" [ngTemplateOutletContext]="{ $implicit: item['value'] }"></ng-container>
+        }
+      } @else if (_isCondition(item)) {
+        <div class="condition">
+          <div class="remove" (click)="removeCondition(index, items)">
+            <mat-icon class="font-icon">close</mat-icon>
+          </div>
+          <button class="condition-field"
+                  [matMenuTriggerFor]="fieldsMenu">{{ getConditionField(item['value'][0])?.name }}</button>
+          <button class="condition-operation"
+                  [matMenuTriggerFor]="operationsMenu">
+            <ng-template [ngTemplateOutlet]="getConditionOperation(item['value'][1])?.name"></ng-template>
+          </button>
+          <div class="relative">
+            @if (editItem && editItem === item) {
+              <div class="absolute start-0 top-0 -translate-y-1/2">
+                @switch (getFieldType(editItem)) {
+                  @case ('array') {
+                    @switch (editItem['value'][1]) {
+                      @case ('equals') {
+                        <mat-form-field class="form-field">
+                          <mat-select placeholder="Select..."
+                                      emrAutoFocus
+                                      (blur)="selectBlur($event)"
+                                      [(ngModel)]="item['value'][2]"
+                                      (ngModelChange)="_emitChangeEvent()">
+                            @for (option of getOptions(editItem); track option.id) {
+                              <mat-option [value]="option.id">{{ option.name }}</mat-option>
+                            }
+                          </mat-select>
+                        </mat-form-field>
+                      }
+
+                      @case ('isAnyOf') {
+                        <mat-form-field class="form-field">
+                          <mat-select placeholder="Select..." multiple
+                                      emrAutoFocus
+                                      (blur)="selectBlur($event)"
+                                      [(ngModel)]="item['value'][2]"
+                                      (closed)="selectClosed()">
+                            @for (option of getOptions(editItem); track option.id) {
+                              <mat-option [value]="option.id">{{ option.name }}</mat-option>
+                            }
+                          </mat-select>
+                        </mat-form-field>
+                      }
+                    }
+                  }
+
+                  @case ('number') {
+                    @switch (editItem['value'][1]) {
+                      @case ('isBetween') {
+                        <div class="flex gap-2 items-center"
+                             emrFocusElement (elementBlurred)="cancelEdit()">
+                          <mat-form-field class="form-field-number">
+                            <input type="number" matInput emrAutoFocus
+                                   [(ngModel)]="item['value'][2][0]"
+                                   (ngModelChange)="_emitChangeEvent()">
+                          </mat-form-field>
+                          <div class="text-neutral-500">&ndash;</div>
+                          <mat-form-field class="form-field-number">
+                            <input type="number" matInput
+                                   [(ngModel)]="item['value'][2][1]"
+                                   (ngModelChange)="_emitChangeEvent()">
+                          </mat-form-field>
+                        </div>
+                      }
+                      @default {
+                        <mat-form-field class="form-field-number">
+                          <input type="number" matInput emrAutoFocus
+                                 (blur)="cancelEdit()"
+                                 [(ngModel)]="item['value'][2]"
+                                 (ngModelChange)="_emitChangeEvent()">
+                        </mat-form-field>
+                      }
+                    }
+                  }
+
+                  @default {
+                    <mat-form-field class="form-field">
+                      <input type="text" matInput emrAutoFocus
+                             (blur)="cancelEdit()"
+                             [(ngModel)]="item['value'][2]"
+                             (ngModelChange)="_emitChangeEvent()">
+                    </mat-form-field>
+                  }
+                }
+              </div>
+            } @else {
+              @if (item['value'][1] !== 'isBlank' && item['value'][1] !== 'isNotBlank') {
+                @if (isValueNotEmpty(item)) {
+                  @if (getFieldType(item) === 'array') {
+                    @if (item['value'][1] === 'equals') {
+                      <button class="condition-value" (click)="modifyValue(item)">
+                        {{ getDataSourceItemNameById(item, item['value'][2]) }}
+                      </button>
+                    } @else {
+                    <button class="condition-value flex items-center gap-2" (click)="modifyValue(item)">
+                      @for (dataSourceItemId of item['value'][2]; track dataSourceItemId; let last = $last) {
+                        <span>{{ getDataSourceItemNameById(item, dataSourceItemId) }}</span>
+                        @if (!last) {
+                          <span class="text-neutral-500">|</span>
+                        }
+                      }
+                    </button>
+                    }
+                  } @else {
+                    @if (item['value'][1] === 'isBetween') {
+                      <button class="condition-value flex items-center gap-2" (click)="modifyValue(item)">
+                        <span>{{ item['value'][2][0] }}</span>
+                        <span class="text-neutral-500">&ndash;</span>
+                        <span>{{ item['value'][2][1] }}</span>
+                      </button>
+                    } @else {
+                      <button class="condition-value" (click)="modifyValue(item)">
+                        <span>{{ item['value'][2] }}</span>
+                      </button>
+                    }
+                  }
+                } @else {
+                  <button class="condition-value" (click)="modifyValue(item)">
+                    <span i18n>&lt;enter a value&gt;</span>
+                  </button>
+                }
+              }
+            }
+          </div>
+        </div>
+        <mat-menu #fieldsMenu>
+          <div emrMenuOptionGroup [(ngModel)]="item['value'][0]">
+            @for (fieldDef of fieldDefs(); track fieldDef) {
+              <mat-option [value]="fieldDef.dataField"
+                          (click)="selectConditionField(item, fieldDef)">{{ fieldDef.name }}</mat-option>
+            }
+          </div>
+        </mat-menu>
+        <mat-menu #operationsMenu>
+          <div emrMenuOptionGroup [ngModel]="item['value'][1]">
+            @for (operation of _operationDefs; track operation.id()) {
+              <div [hidden]="!isOperationAllowedForCondition(item['value'][0], operation.id())">
+                <mat-option [value]="operation.id()" (click)="operationChanged(item, operation.id())">
+                  <div class="flex items-center gap-3">
+                    @if (operation.operationIcon()) {
+                      <ng-template [ngTemplateOutlet]="operationIconTemplateRef(operation)"></ng-template>
+                    }
+                    <div>
+                      <ng-template [ngTemplateOutlet]="operationNameTemplateRef(operation)"></ng-template>
+                    </div>
+                  </div>
+                </mat-option>
+              </div>
+            }
+          </div>
+        </mat-menu>
+      }
+    }
+  </div>
+</ng-template>
+
+<div class="group">
+  <div class="flex items-center group-operations">
+    <button [matMenuTriggerFor]="groupOperationsMenu" class="group-operation">
+      {{ getSelectedGroupOperationName() }}
+    </button>
+    <div [matMenuTriggerFor]="addMenu" class="add">
+      <mat-icon class="font-icon">add</mat-icon>
+    </div>
+  </div>
+  <ng-container [ngTemplateOutlet]="itemsTpl" [ngTemplateOutletContext]="{ $implicit: _value }"></ng-container>
+</div>
+
+<mat-menu #groupOperationsMenu>
+  <div emrMenuOptionGroup [(ngModel)]="_logicalOperator" (ngModelChange)="_emitChangeEvent()">
+    @for (groupOperation of groupOperations(); track groupOperation.id) {
+      <mat-option [value]="groupOperation.id">{{ groupOperation.name }}</mat-option>
+    }
+  </div>
+</mat-menu>
+<mat-menu #addMenu>
+  <button mat-menu-item (click)="addCondition()">Add Condition</button>
+  <button mat-menu-item (click)="addGroup()">Add Group</button>
+</mat-menu>
+
+<ng-container emrFilterBuilderOperationDef="contains" [allowedDataTypes]="['string']">
+  <ng-template emrFilterBuilderOperationName>Contains</ng-template>
+</ng-container>
+<ng-container emrFilterBuilderOperationDef="doesNotContain" [allowedDataTypes]="['string']">
+  <ng-template emrFilterBuilderOperationName>Does not contain</ng-template>
+</ng-container>
+<ng-container emrFilterBuilderOperationDef="startsWith" [allowedDataTypes]="['string']">
+  <ng-template emrFilterBuilderOperationName>Starts with</ng-template>
+</ng-container>
+<ng-container emrFilterBuilderOperationDef="endsWith" [allowedDataTypes]="['string']">
+  <ng-template emrFilterBuilderOperationName>Ends with</ng-template>
+</ng-container>
+<ng-container emrFilterBuilderOperationDef="equals" [allowedDataTypes]="['string', 'number', 'array', 'boolean']">
+  <ng-template emrFilterBuilderOperationName>Equals</ng-template>
+</ng-container>
+<ng-container emrFilterBuilderOperationDef="notEquals" [allowedDataTypes]="['string', 'number', 'boolean']">
+  <ng-template emrFilterBuilderOperationName>Not equals</ng-template>
+</ng-container>
+<ng-container emrFilterBuilderOperationDef="isLessThen" [allowedDataTypes]="['number']">
+  <ng-template emrFilterBuilderOperationName>Is less then</ng-template>
+</ng-container>
+<ng-container emrFilterBuilderOperationDef="isLessThenOrEqual" [allowedDataTypes]="['number']">
+  <ng-template emrFilterBuilderOperationName>Is less then or equal to</ng-template>
+</ng-container>
+<ng-container emrFilterBuilderOperationDef="isGreaterThen" [allowedDataTypes]="['number']">
+  <ng-template emrFilterBuilderOperationName>Is greater then</ng-template>
+</ng-container>
+<ng-container emrFilterBuilderOperationDef="isGreaterThenOrEqual" [allowedDataTypes]="['number']">
+  <ng-template emrFilterBuilderOperationName>Is greater then or equal to</ng-template>
+</ng-container>
+<ng-container emrFilterBuilderOperationDef="isBlank" [allowedDataTypes]="['string']">
+  <ng-template emrFilterBuilderOperationName>Is blank</ng-template>
+</ng-container>
+<ng-container emrFilterBuilderOperationDef="isNotBlank" [allowedDataTypes]="['string']">
+  <ng-template emrFilterBuilderOperationName>Is not blank</ng-template>
+</ng-container>
+<ng-container emrFilterBuilderOperationDef="isBetween" [allowedDataTypes]="['number']">
+  <ng-template emrFilterBuilderOperationName>Is between</ng-template>
+</ng-container>
+<ng-container emrFilterBuilderOperationDef="isAnyOf" [allowedDataTypes]="['array']">
+  <ng-template emrFilterBuilderOperationName>Is any of</ng-template>
+</ng-container>

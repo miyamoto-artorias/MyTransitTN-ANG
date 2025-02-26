@@ -1,0 +1,69 @@
+:host {
+  --emr-file-padding: calc(var(--spacing) * 4) 0;
+  --emr-file-controls-gap: calc(var(--spacing) * 1.5);
+  --emr-file-progress-margin: calc(var(--spacing) * 2) 0 0 0;
+  --emr-file-progress-bg: var(--color-surface-container-high);
+  --emr-file-progress-height: calc(var(--spacing) * 1);
+  --emr-file-progress-border-radius: var(--radius-lg);
+  --emr-file-progress-bar-bg: var(--color-primary);
+  --emr-file-control-color: var(--color-neutral-500);
+  --emr-file-control-hover-color: var(--color-primary);
+  --emr-file-control-font-size: var(--text-xl);
+  --emr-file-name-font-size: var(--text-sm);
+  --emr-file-info-font-size: var(--text-xs);
+  --emr-file-info-color: var(--color-neutral-500);
+  --emr-file-error-font-size: var(--text-xs);
+  --emr-file-error-color: var(--color-red-500);
+
+  display: flex;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: var(--emr-file-padding);
+
+  .name {
+    font-size: var(--emr-file-name-font-size);
+  }
+
+  .info {
+    font-size: var(--emr-file-info-font-size);
+    color: var(--emr-file-info-color);
+  }
+
+  .content {
+    min-width: 0;
+    flex-grow: 1;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: var(--emr-file-controls-gap)
+  }
+
+  .progress {
+    background: var(--emr-file-progress-bg);
+    height: var(--emr-file-progress-height);
+    flex: none;
+    border-radius: var(--emr-file-progress-border-radius);
+    margin: var(--emr-file-progress-margin);
+  }
+
+  .progress-bar {
+    background: var(--emr-file-progress-bar-bg);
+    border-radius: var(--emr-file-progress-border-radius);
+    height: 100%;
+  }
+
+  .error {
+    font-size: var(--emr-file-error-font-size);
+    color: var(--emr-file-error-color);
+  }
+}
+
+:host-context(html.dark) {
+  --emr-file-error-color: var(--color-red-300);
+  --emr-file-progress-bg: var(--color-neutral-500);
+  --emr-file-control-hover-color: var(--color-neutral-300);
+}

@@ -1,0 +1,26 @@
+:host {
+  --emr-upload-area-bg: transparent;
+  --emr-upload-area-padding: calc(var(--spacing) * 10);
+  --emr-upload-area-border: 1px solid var(--color-border);
+  --emr-upload-area-border-radius: var(--radius-2xl);
+  --emr-upload-area-font-size: var(--text-sm);
+  --emr-upload-area-color: var(--color-neutral-600);
+  --emr-upload-area-drop-active-border: 1px dashed var(--color-primary);
+  --emr-upload-area-drop-active-color: var(--color-primary);
+
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  display: flex;
+  color: var(--emr-upload-area-color);
+  border-radius: var(--emr-upload-area-border-radius);
+  border: var(--emr-upload-area-border);
+  font-size: var(--emr-upload-area-font-size);
+  background-color: var(--emr-upload-area-bg);
+  padding: var(--emr-upload-area-padding);
+
+  &.is-drop-active {
+    border: var(--emr-upload-area-drop-active-border);
+    color: var(--emr-upload-area-drop-active-color);
+  }
+}

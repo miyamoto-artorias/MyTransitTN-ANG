@@ -1,0 +1,20 @@
+:host {
+  --emr-suggestions-bg: var(--color-surface-container-lowest);
+  --emr-suggestion-block-heading-color: var(--color-on-surface);
+  --emr-suggestion-block-font-size: var(--text-xs);
+  --emr-suggestion-block-font-weight: 600;
+  --emr-suggestion-block-content-padding: calc(var(--spacing) * 2) 0;
+  --emr-suggestion-height: calc(var(--spacing) * 11);
+  --emr-suggestion-padding: 0 calc(var(--spacing) * 2);
+  --emr-suggestion-hover-bg: var(--color-surface-container-low);
+  --emr-suggestion-border-radius: calc(infinity * 1px);
+
+  display: block;
+  overflow-y: auto;
+  background-color: var(--emr-suggestions-bg);
+}
+
+:host-context(html.dark) {
+  --emr-suggestions-bg: var(--color-surface-container-high);
+  --emr-suggestion-hover-bg: var(--color-surface-bright);
+}

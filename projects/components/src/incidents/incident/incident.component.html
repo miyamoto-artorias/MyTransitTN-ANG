@@ -1,0 +1,13 @@
+<div class="icon">
+  <ng-content select="[emrIncidentIcon]"/>
+</div>
+<div class="content">
+  <div class="data">
+    <ng-content select="emr-incident-title"/>
+    <ng-content select="emr-incident-details"/>
+  </div>
+  <ng-content select="[emrIncidentButton]"/>
+</div>
+<button mat-icon-button class="close -ms-2" (click)="close()">
+  <ng-content select="[emrIncidentClose]"/>
+</button>

@@ -1,0 +1,8 @@
+<h3 class="mat-title-large" mat-dialog-title>{{ title }}</h3>
+<mat-dialog-content>
+  {{ description }}
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="false">Cancel</button>
+  <button mat-flat-button color="primary" [mat-dialog-close]="true" cdkFocusInitial>Confirm</button>
+</mat-dialog-actions>

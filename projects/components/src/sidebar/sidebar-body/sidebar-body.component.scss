@@ -1,0 +1,18 @@
+:host {
+  display: block;
+  width: 100%;
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: var(--emr-sidebar-body-padding);
+  overflow-x: hidden;
+  position: relative;
+}
+
+:host-context(.emr-sidebar.compact) {
+  overflow-y: hidden;
+  padding: var(--emr-sidebar-body-compact-padding);
+}
+
+:host-context(.emr-sidebar.compact:hover) {
+  overflow-y: auto;
+}

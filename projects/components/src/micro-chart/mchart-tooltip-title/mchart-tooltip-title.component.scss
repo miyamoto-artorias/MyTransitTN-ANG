@@ -1,0 +1,11 @@
+:host {
+  display: block;
+  background: var(--color-neutral-200);
+  padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 2);
+  font-weight: 500;
+}
+
+:host-context(html.dark) {
+  background: var(--color-neutral-300);
+  color: var(--color-neutral-900);
+}

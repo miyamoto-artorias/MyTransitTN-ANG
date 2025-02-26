@@ -1,0 +1,15 @@
+<div class="content">
+  @if (iconName()) {
+    <div class="icon">
+      <mat-icon>{{ iconName() }}</mat-icon>
+    </div>
+  }
+  <ng-content/>
+</div>
+@if (closable()) {
+  <div class="close">
+    <button mat-icon-button (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+}

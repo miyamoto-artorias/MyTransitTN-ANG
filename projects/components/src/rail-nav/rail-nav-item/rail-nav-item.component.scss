@@ -1,0 +1,59 @@
+:host {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  cursor: pointer;
+  gap: calc(var(--spacing) * 0.5);
+  color: var(--emr-rail-nav-bg-item-color);
+
+  .icon {
+    padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 4);
+    border-radius: calc(infinity * 1px);
+    color: var(--emr-rail-nav-bg-item-icon-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  &:hover {
+    .icon {
+      background: var(--emr-rail-nav-bg-item-icon-hover-bg);
+
+      ::ng-deep * {
+        scale: 1.1;
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 150ms;
+      }
+    }
+  }
+
+  &:active {
+    .icon {
+      background: var(--emr-rail-nav-bg-item-icon-active-bg);
+    }
+  }
+
+  &.is-active {
+    .icon {
+      background: var(--emr-rail-nav-bg-item-icon-is-active-bg);
+      color: var(--emr-rail-nav-bg-item-icon-is-active-color);
+    }
+  }
+
+  &.is-active:active {
+    .icon {
+      background: var(--emr-rail-nav-bg-item-icon-is-active-active-bg);
+    }
+  }
+
+  .label {
+    font-size: var(--text-tiny);
+  }
+}

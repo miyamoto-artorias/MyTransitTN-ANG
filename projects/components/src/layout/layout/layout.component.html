@@ -1,0 +1,10 @@
+<ng-content select="emr-layout-topbar"/>
+<ng-content select="emr-layout-header"/>
+<div class="body">
+  <ng-content select="emr-layout-sidebar"/>
+  <div class="content">
+    <ng-content/>
+  </div>
+  <ng-content select="emr-layout-aside"/>
+</div>
+<ng-content select="emr-layout-footer"/>

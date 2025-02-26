@@ -1,0 +1,15 @@
+<div [formGroup]="form">
+  <div formArrayName="value" class="inputs">
+    @for (control of controls; track control; let index = $index) {
+      <div class="input">
+        <mat-form-field>
+          <input type="text" matInput emrPinInput
+                 [formControl]="control"
+                 [acceptOnly]="acceptOnly()"
+                 [placeholder]="placeholder()"
+                 [attr.disabled]="isDisabled() || null" maxlength="1" >
+        </mat-form-field>
+      </div>
+    }
+  </div>
+</div>

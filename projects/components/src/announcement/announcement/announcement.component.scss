@@ -1,0 +1,94 @@
+@use '@angular/material' as mat;
+
+:host {
+  --emr-announcement-close-icon-color: var(--color-neutral-800);
+
+  padding-inline-start: calc(var(--spacing) * 5);
+  padding-inline-end: calc(var(--spacing) * 3);
+  height: calc(var(--spacing) * 11);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+
+  &:has(.icon) {
+    padding-inline-start: calc(var(--spacing) * 3.5);
+  }
+
+  .content {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 2.5);
+  }
+
+  .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    @include mat.icon-button-overrides((
+      icon-color: var(--emr-announcement-close-icon-color),
+      state-layer-color: var(--emr-announcement-close-icon-color)
+    ));
+
+    &:hover {
+      opacity: 100%;
+    }
+  }
+
+  &:has(.close) {
+    padding-inline-end: calc(var(--spacing) * 1.5);
+  }
+
+  &[data-variant="neutral"] {
+    background: var(--color-neutral-300);
+    color: var(--color-neutral-900);
+
+    .icon {
+      color: var(--color-neutral-700);
+    }
+  }
+
+  &[data-variant="informative"] {
+    background: var(--color-primary-200);
+    color: var(--color-primary-900);
+
+    .icon {
+      color: var(--color-primary-700);
+    }
+  }
+
+  &[data-variant="negative"] {
+    background: var(--color-error-200);
+    color: var(--color-error-900);
+
+    .icon {
+      color: var(--color-error-700);
+    }
+  }
+
+  &[data-variant="positive"] {
+    background: var(--color-lime-200);
+    color: var(--color-lime-900);
+
+    .icon {
+      color: var(--color-lime-700);
+    }
+  }
+
+  &[data-variant="warning"] {
+    background: var(--color-amber-200);
+    color: var(--color-amber-900);
+
+    .icon {
+      color: var(--color-amber-700);
+    }
+  }
+}

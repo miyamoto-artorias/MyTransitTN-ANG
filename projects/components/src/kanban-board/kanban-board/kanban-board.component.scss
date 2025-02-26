@@ -1,0 +1,36 @@
+:host {
+  --emr-kanban-board-col-width: calc(var(--spacing) * 72);
+  --emr-kanban-board-padding-x: calc(var(--spacing) * 10);
+  --emr-kanban-board-column-gap: calc(var(--spacing) * 5);
+
+  height: 100%;
+
+  .cdk-drag-placeholder {
+    opacity: 60%;
+  }
+
+  &.is-dragging-active {
+    .scroll-container {
+      transition-property: all;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 150ms;
+    }
+
+    .kanban-item {
+      &:hover {
+        outline: none;
+      }
+    }
+  }
+}
+
+.kanban-item {
+  &.cdk-drag-preview {
+    background: var(--color-surface-container-lowest);
+    padding: calc(var(--spacing) * 3);
+    cursor: pointer;
+    flex: none;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-2xl);
+  }
+}

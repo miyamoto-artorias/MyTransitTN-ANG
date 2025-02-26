@@ -1,0 +1,21 @@
+:host {
+  --emr-icon-size: calc(var(--spacing) * 6);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+
+  svg {
+    flex: none;
+  }
+
+  &:not([class*="w-"]):not([class*="size-"]) {
+    width: var(--emr-icon-size);
+  }
+
+  &:not([class*="h-"]):not([class*="size-"]) {
+    height: var(--emr-icon-size);
+  }
+}

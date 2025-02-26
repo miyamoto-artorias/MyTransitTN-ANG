@@ -1,0 +1,20 @@
+:host {
+  display: block;
+  position: relative;
+  scroll-snap-type: x mandatory;
+
+  .content {
+    display: flex;
+    overflow: hidden;
+    gap: calc(var(--spacing) * 8);
+  }
+
+  .controls {
+    margin-top: calc(var(--spacing) * 4);
+    gap: calc(var(--spacing) * 3);
+
+    &:empty {
+      display: none;
+    }
+  }
+}

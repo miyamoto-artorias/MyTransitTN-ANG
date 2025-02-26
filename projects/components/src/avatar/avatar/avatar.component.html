@@ -1,0 +1,25 @@
+@if (src()) {
+  <img class="image" loading="lazy" [ngSrc]="src()" fill [alt]="alt()" (load)="onImageLoaded()">
+}
+
+@if (presenceIndicator()) {
+  <div class="presence-indicator"
+       [class.is-online]="presenceIndicator() === 'online'"
+       [class.is-offline]="presenceIndicator() === 'offline'"
+       [class.is-away]="presenceIndicator() === 'away'"></div>
+}
+
+@if (text() && showText) {
+  <svg viewBox="0 0 50 50" class="text">
+    <text
+      x="50%"
+      y="50%"
+      alignment-baseline="central"
+      text-anchor="middle"
+      font-weight="inherit"
+      font-size="20"
+      fill="currentColor">{{ text() }}</text>
+  </svg>
+}
+
+<ng-content select="mat-icon,emr-icon"/>

@@ -1,0 +1,15 @@
+:host {
+  display: block;
+
+  &:not([class*="w-"]) {
+    width: 1px;
+  }
+
+  &:not([class*="bg-"]) {
+    background: var(--color-border);
+  }
+
+  &:not([class*="h-"]) {
+    height: calc(var(--spacing) * 4);
+  }
+}

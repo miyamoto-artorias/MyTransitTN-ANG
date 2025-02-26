@@ -1,0 +1,111 @@
+:host {
+  --emr-command-bar-height: calc(var(--spacing) * 12);
+  --emr-command-bar-padding: 0 calc(var(--spacing) * 1);
+  --emr-command-bar-margin: calc(var(--spacing) * 8) 0;
+  --emr-command-bar-zindex: 50;
+  --emr-command-bar-bg: var(--color-neutral-950);
+  --emr-command-bar-color: var(--color-neutral-200);
+  --emr-command-bar-border: 1px solid var(--color-neutral-700);
+  --emr-command-bar-shadow: var(--shadow-lg);
+  --emr-command-bar-border-radius: calc(infinity * 1px);
+  --emr-command-bar-command-height: calc(var(--spacing) * 10);
+  --emr-command-bar-command-padding: 0 calc(var(--spacing) * 3.5);
+  --emr-command-bar-command-font-size: var(--text-sm);
+  --emr-command-bar-command-color: var(--color-neutral-200);
+  --emr-command-bar-command-hover-color: var(--color-neutral-100);
+  --emr-command-bar-command-hover-bg: var(--color-neutral-800);
+  --emr-command-bar-value-color: var(--color-neutral-200);
+  --emr-command-bar-command-gap: calc(var(--spacing) * 3);
+  --emr-command-bar-content-padding: 0 calc(var(--spacing) * 4);
+  --emr-command-bar-font-size: var(--text-sm);
+  --emr-command-bar-divider-width: 1px;
+  --emr-command-bar-divider-height: calc(var(--spacing) * 6);
+  --emr-command-bar-divider-bg: var(--color-neutral-600);
+  --emr-command-bar-command-shortcut-bg: var(--color-neutral-700);
+  --emr-command-bar-command-shortcut-border-radius: var(--radius-lg);
+  --emr-command-bar-command-shortcut-font-size: var(--text-xs);
+  --emr-command-bar-command-shortcut-color: var(--color-neutral-300);
+  --emr-command-bar-command-shortcut-padding: 0 5px;
+  --emr-command-bar-command-shortcut-border: 1px solid var(--color-neutral-600);
+  --emr-command-bar-command-shortcut-size: calc(var(--spacing) * 5);
+
+  left: 50%;
+  translate: -50% 0;
+  height: var(--emr-command-bar-height);
+  border: var(--emr-command-bar-border);
+  box-shadow: var(--emr-command-bar-shadow);
+  border-radius: var(--emr-command-bar-border-radius);
+  z-index: -1;
+  font-size: var(--emr-command-bar-font-size);
+  color: var(--emr-command-bar-color);
+  padding: var(--emr-command-bar-padding);
+  overflow: hidden;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  width: min-content;
+  position: fixed;
+  background-color: var(--emr-command-bar-bg);
+  margin: var(--emr-command-bar-margin);
+  gap: calc(var(--spacing) * 1);
+
+  .content {
+    &:empty {
+      display: none;
+    }
+
+    white-space: nowrap;
+    padding: var(--emr-command-bar-content-padding);
+  }
+
+  &.is-open {
+    opacity: 1;
+    z-index: var(--emr-command-bar-zindex);
+  }
+
+  &[emr-command-bar-position="top"] {
+    top: 0;
+  }
+
+  &[emr-command-bar-position="top"].is-open {
+    animation: 0.3s emr-command-bar-animation-from-top;
+  }
+
+  &[emr-command-bar-position="bottom"] {
+    bottom: 0;
+  }
+
+  &[emr-command-bar-position="bottom"].is-open {
+    animation: 0.3s emr-command-bar-animation-from-bottom;
+  }
+
+  @keyframes emr-command-bar-animation-from-top {
+    0% {
+      transform: translateY(-150%) scale(.9);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes emr-command-bar-animation-from-bottom {
+    0% {
+      transform: translateY(150%) scale(.9);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+}
+
+:host-context(html.dark) {
+  --emr-command-bar-bg: var(--color-primary-200);
+  --emr-command-bar-color: var(--color-neutral-950);
+  --emr-command-bar-command-color: var(--color-neutral-950);
+}

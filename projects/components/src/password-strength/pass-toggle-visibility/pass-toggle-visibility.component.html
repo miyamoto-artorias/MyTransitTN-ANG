@@ -1,0 +1,4 @@
+<button (click)="_visible = !_visible" mat-icon-button matRipple
+        [attr.tabindex]="tabindex() ? tabindex() : null" type="button">
+  <mat-icon>{{ _visible ? "visibility" : "visibility_off" }}</mat-icon>
+</button>

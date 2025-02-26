@@ -1,0 +1,28 @@
+:host {
+  --emr-screen-loader-bg: var(--mat-app-background-color);
+
+  opacity: 0;
+  position: fixed;
+  inset: 0;
+  z-index: -9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: var(--emr-screen-loader-bg);
+
+  &.is-opened {
+    z-index: 9999;
+  }
+
+  .message {
+    max-width: 600px;
+    line-height: var(--leading-snug);
+    text-align: center;
+  }
+
+  .progress-bar {
+    width: calc(var(--spacing) * 64);
+    margin-top: calc(var(--spacing) * 4);
+  }
+}

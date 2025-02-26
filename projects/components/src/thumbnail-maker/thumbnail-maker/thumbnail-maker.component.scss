@@ -1,0 +1,63 @@
+:host {
+  --emr-thumbnail-width: 720px;
+  --emr-thumbnail-height: 460px;
+
+  display: block;
+  width: max-content;
+  overflow: hidden;
+  position: relative;
+
+  .content {
+    display: flex;
+    width: var(--emr-thumbnail-width);
+    height: var(--emr-thumbnail-height);
+    mask-image: radial-gradient(circle, black 150px, rgba(0, 0, 0, 0.5) 150px);
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    line-height: 1;
+    position: relative;
+    user-select: none;
+  }
+
+  .image {
+    object-fit: fill;
+    max-width: none;
+    max-height: none;
+    line-height: 1;
+    user-select: none;
+    cursor: move;
+  }
+
+  .helper-text {
+    position: absolute;
+    z-index: 1;
+    top: var(-h-5);
+    inset-inline-start: 50%;
+    background-color: var(--color-neutral-950);
+    color: white;
+    border-radius: var(--radius-lg);
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+    font-size: var(--text-sm);
+    opacity: 90%;
+    --tw-translate-x: -50%;
+    width: max-content;
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  }
+
+  .controls {
+    margin-top: calc(var(--spacing) * 3);
+    margin-bottom: calc(var(--spacing) * 3);
+  }
+
+  &.loading {
+    .image {
+      visibility: hidden;
+      position: relative;
+      z-index: -1;
+    }
+  }
+}

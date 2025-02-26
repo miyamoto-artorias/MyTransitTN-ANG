@@ -1,0 +1,96 @@
+:host {
+  --emr-avatar-font-weight: 500;
+  --emr-avatar-size: calc(var(--spacing) * 10);
+  --emr-avatar-border-radius: calc(infinity * 1px);
+  --emr-avatar-bg: var(--color-emerald-500);
+  --emr-avatar-color: white;
+  --emr-avatar-presence-indicator-size: 20%;
+  --emr-avatar-presence-indicator-position-top: 5%;
+  --emr-avatar-presence-indicator-position-end: 5%;
+  --emr-avatar-presence-indicator-online-bg: var(--color-green-500);
+  --emr-avatar-presence-indicator-offline-bg: var(--color-neutral-300);
+  --emr-avatar-presence-indicator-away-bg: var(--color-yellow-400);
+  --emr-avatar-presence-indicator-outline: white solid 2px;
+  --emr-avatar-inner-border: inset 0 0 2px var(--color-border);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  flex: none;
+  text-transform: uppercase;
+  position: relative;
+  font-weight: var(--emr-avatar-font-weight);
+
+  &:not([class*="shadow-"]) {
+    box-shadow: var(--emr-avatar-inner-border);
+  }
+
+  .svg {
+    overflow: hidden;
+    border-radius: inherit;
+  }
+
+  &:not([class*="rounded"]),
+  &:not([class*="rounded"]) .svg {
+    border-radius: var(--emr-avatar-border-radius);
+  }
+
+  &:not([class*="w-"]):not([class*="size-"]) {
+    width: var(--emr-avatar-size);
+  }
+
+  &:not([class*="h-"]):not([class*="size-"]) {
+    height: var(--emr-avatar-size);
+  }
+
+  &.is-clickable {
+    cursor: pointer;
+  }
+
+  &.is-hidden {
+    display: none;
+  }
+
+  &.is-clickable:active {
+    scale: .97;
+  }
+
+  .image {
+    display: inline;
+    object-fit: cover;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    z-index: 1;
+  }
+
+  .presence-indicator {
+    position: absolute;
+    z-index: 1;
+    outline: var(--emr-avatar-presence-indicator-outline);
+    border-radius: 6.1875rem;
+    width: var(--emr-avatar-presence-indicator-size);
+    height: var(--emr-avatar-presence-indicator-size);
+    top: var(--emr-avatar-presence-indicator-position-top);
+    inset-inline-end: var(--emr-avatar-presence-indicator-position-end);
+
+    &.is-online {
+      background: var(--emr-avatar-presence-indicator-online-bg);
+    }
+
+    &.is-offline {
+      background: var(--emr-avatar-presence-indicator-offline-bg);
+    }
+
+    &.is-away {
+      background: var(--emr-avatar-presence-indicator-away-bg);
+    }
+  }
+}
+
+:host-context(html.dark) {
+  --emr-avatar-group-item-border: 0.125rem solid var(--color-neutral-950);
+  --emr-avatar-presence-indicator-outline: var(--color-neutral-950) solid 2px;
+}

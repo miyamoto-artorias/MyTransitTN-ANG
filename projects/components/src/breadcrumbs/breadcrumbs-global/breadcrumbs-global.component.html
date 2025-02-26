@@ -1,0 +1,50 @@
+<emr-breadcrumbs [lastItemAsLink]="lastItemAsLink()">
+  @for (breadcrumb of breadcrumbs(); track $index; let last = $last) {
+    @switch (breadcrumb.type) {
+      @case ('link') {
+        <a emr-breadcrumb-item [routerLink]="breadcrumb.route">
+          <ng-container emrBreadcrumbItemIcon>
+            @if (breadcrumb.icon) {
+              @if (_itemIconDef()) {
+                <ng-container [ngTemplateOutlet]="iconTemplateRef"
+                              [ngTemplateOutletContext]="{ $implicit: breadcrumb.icon, breadcrumb }"/>
+              } @else {
+                <mat-icon>{{ breadcrumb.icon }}</mat-icon>
+              }
+            }
+          </ng-container>
+
+          @if (breadcrumb.title) {
+            <emr-breadcrumb-title>{{ breadcrumb.title }}</emr-breadcrumb-title>
+          }
+          @if (breadcrumb.name) {
+            {{ breadcrumb.name }}
+          }
+        </a>
+      }
+      @default {
+        <emr-breadcrumb-item>
+          <ng-container emrBreadcrumbItemIcon>
+            @if (breadcrumb.icon) {
+              @if (_itemIconDef()) {
+                <ng-container [ngTemplateOutlet]="iconTemplateRef"
+                              [ngTemplateOutletContext]="{ $implicit: breadcrumb.icon, breadcrumb }"/>
+              } @else {
+                <mat-icon>{{ breadcrumb.icon }}</mat-icon>
+              }
+            }
+          </ng-container>
+          @if (breadcrumb.title) {
+            <emr-breadcrumb-title>{{ breadcrumb.title }}</emr-breadcrumb-title>
+          }
+          @if (breadcrumb.name) {
+            {{ breadcrumb.name }}
+          }
+        </emr-breadcrumb-item>
+      }
+    }
+    @if (!last) {
+      <emr-breadcrumb-separator>{{ separator() }}</emr-breadcrumb-separator>
+    }
+  }
+</emr-breadcrumbs>

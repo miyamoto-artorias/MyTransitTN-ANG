@@ -1,0 +1,28 @@
+:host {
+  display: block;
+  width: max-content;
+  border-radius: calc(infinity * 1px);
+  padding: calc(var(--spacing) * 2) calc(var(--spacing) * 4);
+  color: var(--color-neutral-800);
+  font-size: var(--text-sm);
+  margin-top: calc(var(--spacing) * 1.5);
+  border: 1px solid transparent;
+
+
+  &:hover {
+    background: var(var(--color-neutral-200));
+    color: var(--color-neutral-900);
+  }
+
+  &.is-active {
+    border-color: var(--sys-outline);
+  }
+}
+
+:host-context(html.dark) {
+  color: var(--color-neutral-300);
+
+  &:hover {
+    background: var(var(--color-neutral-600));
+  }
+}

@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  z-index: 101;
+
+  &:has(.emr-sidebar.compact) {
+    z-index: 102;
+  }
+
+  &.is-hidden {
+    display: none;
+  }
+}

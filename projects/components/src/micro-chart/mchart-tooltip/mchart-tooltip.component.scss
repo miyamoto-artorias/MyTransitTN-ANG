@@ -1,0 +1,26 @@
+:host {
+  display: block;
+  width: max-content;
+  box-shadow: var(--shadow-default);
+  border-radius: var(--radius-lg);
+  background: white;
+  font-size: var(--text-xs);
+  overflow: hidden;
+
+  .title {
+    &:empty {
+      display: none;
+    }
+  }
+
+  .body {
+    &:empty {
+      display: none;
+    }
+  }
+}
+
+:host-context(html.dark) {
+  background: var(--color-tertiary-200);
+  color: var(--color-neutral-800);
+}

@@ -1,0 +1,35 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  white-space: nowrap;
+  padding: var(--emr-command-bar-command-padding);
+  font-size: var(--emr-command-bar-command-font-size);
+  cursor: pointer;
+  gap: var(--emr-command-bar-command-gap);
+  color: var(--emr-command-bar-command-color);
+  user-select: none;
+  border-radius: calc(infinity * 1px);
+  height: var(--emr-command-bar-command-height);
+
+  &:hover {
+    color: var(--emr-command-bar-command-hover-color);
+    background: var(--emr-command-bar-command-hover-bg);
+  }
+
+  .shortcut {
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--emr-command-bar-command-shortcut-bg);
+    border-radius: var(--emr-command-bar-command-shortcut-border-radius);
+    font-size: var(--emr-command-bar-command-shortcut-font-size);
+    color: var(--emr-command-bar-command-shortcut-color);
+    padding: var(--emr-command-bar-command-shortcut-padding);
+    border: var(--emr-command-bar-command-shortcut-border);
+    flex: none;
+    width: var(--emr-command-bar-command-shortcut-size);
+    height: var(--emr-command-bar-command-shortcut-size);
+  }
+}

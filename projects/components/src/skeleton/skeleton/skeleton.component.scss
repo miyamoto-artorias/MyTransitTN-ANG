@@ -1,0 +1,24 @@
+:host {
+  --emr-skeleton-gap: calc(var(--spacing) * 4);
+  --emr-skeleton-item-border-radius: var(--radius-2xl);
+  --emr-skeleton-from-bg: var(--emr-neutral-200); // theme('colors.neutral.200/80');
+  --emr-skeleton-from-to: var(--emr-neutral-300); // theme('colors.neutral.300/70');
+
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: var(--emr-skeleton-gap);
+
+  &.is-direction-col {
+    flex-direction: column;
+  }
+
+  &.is-direction-row {
+    flex-direction: row;
+  }
+}
+
+:host-context(html.dark) {
+  --emr-skeleton-from-bg: var(--emr-neutral-500); // theme('colors.neutral.500/80');
+  --emr-skeleton-from-to: var(--emr-neutral-600); // theme('colors.neutral.600/70');
+}

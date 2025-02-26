@@ -1,0 +1,16 @@
+:host {
+  display: block;
+  padding: 0 calc(var(--spacing) * 2);
+
+  .divider {
+    height: calc(var(--spacing) * 6);
+    background: var(--color-neutral-300);
+    width: 1px;
+  }
+}
+
+:host-context(html.dark) {
+  .divider {
+    background: var(--color-neutral-500);
+  }
+}

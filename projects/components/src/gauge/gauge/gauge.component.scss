@@ -1,0 +1,43 @@
+:host {
+  --emr-gauge-value-color: var(--color-neutral-700);
+  --emr-gauge-bg: var(--color-neutral-300);
+  --emr-gauge-fill: var(--color-primary);
+  --emr-gauge-size: calc(var(--spacing) * 20);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex: none;
+  user-select: none;
+
+  &:not([class*="w-"]):not([class*="size-"]) {
+    width: var(--emr-gauge-size);
+  }
+
+  &:not([class*="h-"]):not([class*="size-"]) {
+    height: var(--emr-gauge-size);
+  }
+
+  .bg {
+    color: var(--emr-gauge-bg);
+  }
+
+  .fill {
+    transition: stroke-dasharray 1s ease 0s, stroke 1s ease 0s;
+    animation: emr-gauge-fill 1s ease forwards;
+    color: var(--emr-gauge-fill);
+  }
+
+  @keyframes emr-gauge-fill {
+    from {
+      stroke-dashoffset: 332;
+    }
+  }
+}
+
+:host-context(html.dark) {
+  --emr-gauge-value-color: var(--color-neutral-300);
+  --emr-gauge-bg: var(--color-neutral-600);
+}

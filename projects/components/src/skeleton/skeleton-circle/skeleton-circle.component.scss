@@ -1,0 +1,27 @@
+:host {
+  --emr-skeleton-circle-size: calc(var(--spacing) * 14);
+
+  animation: emr-skeleton-loading 1s linear infinite alternate;
+
+  display: inline-flex;
+  border-radius: calc(infinity * 1px);
+  flex: none;
+
+  &:not([class*="w-"]):not([class*="size-"]) {
+    width: var(--emr-skeleton-circle-size);
+  }
+
+  &:not([class*="h-"]):not([class*="size-"]) {
+    height: var(--emr-skeleton-circle-size);
+  }
+
+  @keyframes emr-skeleton-loading {
+    0% {
+      background: var(--emr-skeleton-from-bg);
+    }
+
+    100% {
+      background: var(--emr-skeleton-from-to);
+    }
+  }
+}
