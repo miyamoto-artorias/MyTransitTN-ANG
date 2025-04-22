@@ -1,13 +1,13 @@
 <emr-sidebar [compact]="compact" class="sidebar">
   <emr-sidebar-header class="header">
     <div class="h-20 flex items-center w-full justify-between border-b border-b-default">
-      <a emr-logo routerLink="/" emrSidebarCompactViewMode>EL</a>
-      <a emr-logo routerLink="/" emrSidebarFullViewMode>ELEMENTAR</a>
+      <a emr-logo routerLink="/" emrSidebarCompactViewMode>MTTN</a>
+      <a emr-logo routerLink="/" emrSidebarFullViewMode> <img src="assets/pnglogo.png" height="40"/>     </a>
       <button mat-icon-button (click)="compact = !compact" class="sidebar-toggle">
         @if (compact) {
           <mat-icon>keyboard_double_arrow_right</mat-icon>
         } @else {
-          <mat-icon>keyboard_double_arrow_left</mat-icon>
+          <mat-icon>keyboard_double_arrow_left</mat-icon> 
         }
       </button>
     </div>
