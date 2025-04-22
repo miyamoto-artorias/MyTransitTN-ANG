@@ -41,6 +41,7 @@
   .header {
     --emr-sidebar-header-padding: 0 calc(var(--spacing) * 7);
     --emr-sidebar-header-compact-padding: 0 calc(var(--spacing) * 7);
+    
   }
 
   .logo {
@@ -79,4 +80,26 @@
       }
     }
   }
+}
+
+/* Add these CSS rules */
+.logo-link {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 8px 0;
+}
+
+.logo-image {
+  //max-width: 100%;
+  height: auto;
+  max-height: 80px; /* Match your desired height */
+  width: 300px;
+  object-fit: contain;
+}
+
+/* Adjust header padding if needed */
+.header {
+  --emr-sidebar-header-padding: 0 calc(var(--spacing) * 3);
+  --emr-sidebar-header-compact-padding: 0 calc(var(--spacing) * 3);
 }
