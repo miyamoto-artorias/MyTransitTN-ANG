@@ -20,7 +20,6 @@ import { HorizontalDividerComponent } from '@elementar-ui/components';
   styleUrl: './toolbar.component.scss'
 })
 export class ToolbarComponent {
-  subscription = 'Free';
-  email = 'elementarlabs@gmail.com';
-  name = 'Pavel Salauyou';
+  email = 'MyTransitTN@gmail.com';
+  name = 'user1';
 }
