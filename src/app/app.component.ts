@@ -30,7 +30,7 @@ export class AppComponent implements OnInit {
   private _platformId = inject(PLATFORM_ID);
   private _router = inject(Router);
 
-  loadingText = signal('Application Loading');
+  loadingText = signal('loading MyTransitTN...');
   pageLoaded = signal(false);
 
   constructor() {
@@ -48,7 +48,7 @@ export class AppComponent implements OnInit {
           setTimeout(() => {
             this._screenLoader.hide();
             this.pageLoaded.set(true);
-          }, 3000);
+          }, 1500);
         })
       ;
 
@@ -65,11 +65,11 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this._themeManager.setColorScheme(this._themeManager.getPreferredColorScheme());
 
-    if (isPlatformBrowser(this._platformId)) {
-      setTimeout(() => {
-        this.loadingText.set('loading MyTransitTN...');
-      }, 1500);
-    }
+    // if (isPlatformBrowser(this._platformId)) {
+    //   setTimeout(() => {
+    //     this.loadingText.set('second loading...');
+    //   }, 1500);
+    // }
 
     this._seoService.trackCanonicalChanges(this._envService.getValue('siteUrl'));
   }
