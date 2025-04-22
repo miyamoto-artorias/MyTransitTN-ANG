@@ -67,7 +67,7 @@ export class AppComponent implements OnInit {
 
     if (isPlatformBrowser(this._platformId)) {
       setTimeout(() => {
-        this.loadingText.set('Initializing Modules');
+        this.loadingText.set('loading MyTransitTN...');
       }, 1500);
     }
 
