@@ -9,14 +9,56 @@
     <div class="h-[300px] overflow-y-auto">
       @if (notifications.length > 0) {
         <emr-notification-list [notifications]="notifications" class="p-3 gap-3">
-          <ng-template emrNotificationDef="mentionedInComment" let-notification>
-            <emr-mentioned-in-comment [notification]="notification" matRipple
-                                      class="bg-surface-bright cursor-pointer hover:bg-surface-container-lowest rounded-xl shadow-sm p-4"/>
+
+          <!-- Train Arrived -->
+          <ng-template emrNotificationDef="trainArrived" let-notification>
+            <div matRipple class="bg-surface-bright cursor-pointer hover:bg-surface-container-lowest rounded-xl shadow-sm p-4 flex items-start gap-3">
+              <img [src]="notification.actor.avatarUrl" alt="avatar" class="w-8 h-8 rounded-full" />
+              <div>
+                <p class="font-semibold text-on-surface">Train {{ notification.payload.trainNumber }} has arrived</p>
+                <p class="text-sm text-on-surface-variant">Platform: {{ notification.payload.platform }}</p>
+                <p class="text-xs text-on-surface-variant mt-1">{{ notification.createdAt }}</p>
+              </div>
+            </div>
           </ng-template>
-          <ng-template emrNotificationDef="inviteToEditFilesInFolder" let-notification>
-            <emr-invite-to-edit-files-in-folder [notification]="notification" matRipple
-                                                class="bg-surface-bright cursor-pointer hover:bg-surface-container-lowest rounded-xl shadow-sm p-4"/>
+
+          <!-- Destination Reached -->
+          <ng-template emrNotificationDef="destinationReached" let-notification>
+            <div matRipple class="bg-surface-bright cursor-pointer hover:bg-surface-container-lowest rounded-xl shadow-sm p-4 flex items-start gap-3">
+              <img [src]="notification.actor.avatarUrl" alt="avatar" class="w-8 h-8 rounded-full" />
+              <div>
+                <p class="font-semibold text-on-surface">You have reached your destination: {{ notification.payload.destination }}</p>
+                <p class="text-sm text-on-surface-variant">Train {{ notification.payload.trainNumber }}</p>
+                <p class="text-xs text-on-surface-variant mt-1">{{ notification.createdAt }}</p>
+              </div>
+            </div>
           </ng-template>
+
+          <!-- Train Cancelled -->
+          <ng-template emrNotificationDef="trainCancelled" let-notification>
+            <div matRipple class="bg-surface-bright cursor-pointer hover:bg-surface-container-lowest rounded-xl shadow-sm p-4 flex items-start gap-3">
+              <img [src]="notification.actor.avatarUrl" alt="avatar" class="w-8 h-8 rounded-full" />
+              <div>
+                <p class="font-semibold text-error">Train {{ notification.payload.trainNumber }} has been cancelled</p>
+                <p class="text-sm text-on-surface-variant">Reason: {{ notification.payload.reason }}</p>
+                <p class="text-xs text-on-surface-variant mt-1">{{ notification.createdAt }}</p>
+              </div>
+            </div>
+          </ng-template>
+
+          <!-- Ticket Reserved -->
+          <ng-template emrNotificationDef="ticketReserved" let-notification>
+            <div matRipple class="bg-surface-bright cursor-pointer hover:bg-surface-container-lowest rounded-xl shadow-sm p-4 flex items-start gap-3">
+              <img [src]="notification.actor.avatarUrl" alt="avatar" class="w-8 h-8 rounded-full" />
+              <div>
+                <p class="font-semibold text-on-surface">Ticket Reserved</p>
+                <p class="text-sm text-on-surface-variant">Seat: {{ notification.payload.seat }} Coach: {{ notification.payload.coach }}</p>
+                <p class="text-sm text-on-surface-variant">Train {{ notification.payload.trainNumber }}</p>
+                <p class="text-xs text-on-surface-variant mt-1">{{ notification.createdAt }}</p>
+              </div>
+            </div>
+          </ng-template>
+
         </emr-notification-list>
         <div class="px-4 mb-3">
           <a routerLink="/pages/account/notifications" mat-button class="w-full">View all</a>

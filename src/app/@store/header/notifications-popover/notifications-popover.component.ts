@@ -1,19 +1,18 @@
 import { Component } from '@angular/core';
 import { Notification, NotificationDefDirective, NotificationListComponent } from '@elementar-ui/components';
 
-import { InviteToEditFilesInFolderNotification, MentionedInCommentNotification } from '@store/notifications';
 import { RouterLink } from '@angular/router';
 import { MatAnchor, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatRipple } from '@angular/material/core';
 import { PopoverComponent } from '@elementar-ui/components';
 
+
 @Component({
   selector: 'emr-notifications-popover',
+  standalone: true,
   imports: [
     PopoverComponent,
-    InviteToEditFilesInFolderNotification,
-    MentionedInCommentNotification,
     NotificationDefDirective,
     NotificationListComponent,
     RouterLink,
@@ -21,7 +20,7 @@ import { PopoverComponent } from '@elementar-ui/components';
     MatIcon,
     MatIconButton,
     MatRipple
-],
+  ],
   templateUrl: './notifications-popover.component.html',
   styleUrl: './notifications-popover.component.scss'
 })
@@ -30,40 +29,65 @@ export class NotificationsPopoverComponent {
     {
       actor: {
         id: 1,
-        name: 'Justin Hansen',
-        username: 'justin.hansen',
-        avatarUrl: 'assets/avatars/5.svg'
+        name: 'Train Station',
+        username: 'system',
+        avatarUrl: 'assets/train.png'
       },
-      notifier: {
-        id: 2,
-        name: 'Elma Johnson',
-        username: 'elma.johnson',
-        avatarUrl: 'assets/avatars/2.svg'
-      },
+      notifier: 'System',
+      type: 'trainArrived',
       payload: {
-        content: 'what did you say?'
+        trainNumber: 'ICE 789',
+        platform: '5B'
       },
-      type: 'mentionedInComment',
-      createdAt: '1 hour ago'
+      createdAt: '2 mins ago'
+    },
+    {
+      actor: {
+        id: 2,
+        name: 'Train Assistant',
+        username: 'assistant.bot',
+        avatarUrl: 'assets/train.png'
+      },
+      notifier: 'Assistant Bot',
+      type: 'destinationReached',
+      payload: {
+        destination: 'Berlin Central',
+        trainNumber: 'ICE 123'
+      },
+      createdAt: '10 mins ago'
     },
     {
       actor: {
         id: 3,
-        name: 'Johnny Gladden',
-        username: 'johnny.gladden',
-        avatarUrl: 'assets/avatars/6.svg'
+        name: 'System Alert',
+        username: 'system',
+        avatarUrl: 'assets/train.png'
       },
-      notifier: {
-        id: 4,
-        name: 'Angela Naylor',
-        username: 'angela.naylor',
-        avatarUrl: 'assets/avatars/3.svg'
-      },
+      notifier: 'System',
+      type: 'trainCancelled',
       payload: {
-        folderName: 'My New Project'
+        trainNumber: 'ICE 456',
+        reason: 'Weather conditions'
       },
-      type: 'inviteToEditFilesInFolder',
-      createdAt: '2 hours ago'
+      createdAt: '30 mins ago'
+    },
+    {
+      actor: {
+        id: 4,
+        name: 'Booking System',
+        username: 'booking.bot',
+        avatarUrl: 'assets/train.png'
+      },
+      notifier: 'Booking Bot',
+      type: 'ticketReserved',
+      payload: {
+        seat: '12A',
+        coach: 'B',
+        trainNumber: 'ICE 321'
+      },
+      createdAt: '1 hour ago'
     }
   ];
+
+
 }
