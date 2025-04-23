@@ -7,11 +7,7 @@ const routes: Routes = [
     title: 'Purchase Ticket',
     loadComponent: () => import('./purchase-ticket/purchase-ticket.component').then(c => c.PurchaseTicketComponent)
   },
-  {
-    path: 'purchase-history',
-    title: 'Purchase History',
-    loadComponent: () => import('./purchase-ticket/purchase-ticket.component/').then(c => c.PurchaseTicketComponent)
-  },
+ 
   {
     path: '',
     redirectTo: 'purchase-ticket',
