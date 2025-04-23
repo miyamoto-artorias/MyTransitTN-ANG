@@ -66,30 +66,51 @@ export class SidebarComponent implements OnInit {
         {
           key: uuid(),
           type: 'link',
-          name: 'Calender',
-          link: '/pages/dashboard/calender'
+          name: 'Calendar',
+          link: '/pages/dashboard/calendar'
         }
       ]
     },
     {
       key: 'user',
       type: 'group',
-      name: 'user',
-      icon: 'dashboard',
+      name: 'User',
+      icon: 'person',
       children: [
         {
           key: uuid(),
           type: 'link',
-          name: 'Basic',
-          link: '/pages/dashboard/basic'
-        },{
-          key: uuid(),  
+          name: 'Profile',
+          link: '/pages/user/profile'
+        },
+        {
+          key: uuid(),
           type: 'link',
-          name: 'purchase history',      
-          link: '/pages/dashboard/purchase-history'}
+          name: 'Purchase History',
+          link: '/pages/user/purchase-history'
+        }
       ]
     },
-    
+    {
+      key: 'ticket',
+      type: 'group',
+      name: 'Ticket',
+      icon: 'confirmation_number',
+      children: [
+        {
+          key: uuid(),
+          type: 'link',
+          name: 'Purchase Ticket',
+          link: '/pages/ticket/purchase-ticket'
+        },
+        {
+          key: uuid(),
+          type: 'link',
+          name: 'Purchase History',
+          link: '/pages/ticket/purchase-history'
+        }
+      ]
+    }
   ];
   navItemLinks: NavigationItem[] = [];
   activeKey: null | string = null;

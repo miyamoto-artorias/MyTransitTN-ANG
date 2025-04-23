@@ -1,0 +1,115 @@
+<div class="purchase-ticket-container">
+  <mat-card class="search-card">
+    <mat-card-header>
+      <mat-card-title>Train Ticket Purchase</mat-card-title>
+      <mat-card-subtitle>Find and book your train journey</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="search-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Departure City</mat-label>
+            <mat-select [(ngModel)]="departureCity">
+              <mat-option *ngFor="let city of cities" [value]="city">
+                {{city}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Arrival City</mat-label>
+            <mat-select [(ngModel)]="arrivalCity">
+              <mat-option *ngFor="let city of cities" [value]="city">
+                {{city}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Travel Date</mat-label>
+            <input matInput [matDatepicker]="picker" [(ngModel)]="travelDate">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Passengers</mat-label>
+            <input matInput type="number" min="1" max="10" [(ngModel)]="passengerCount" 
+                   (change)="onPassengerCountChange()">
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="routes-container" *ngIf="filteredRoutes.length > 0">
+    <h2>Available Routes</h2>
+    <div class="route-cards">
+      <mat-card *ngFor="let route of filteredRoutes" 
+                [class.selected]="selectedRoute?.id === route.id"
+                (click)="onRouteSelect(route)">
+        <mat-card-content>
+          <div class="route-info">
+            <div class="time-info">
+              <span class="time">{{route.departureTime}}</span>
+              <span class="city">{{route.departure}}</span>
+            </div>
+            
+            <div class="duration-info">
+              <mat-icon>train</mat-icon>
+              <span>{{route.duration}}</span>
+            </div>
+            
+            <div class="time-info">
+              <span class="time">{{route.arrivalTime}}</span>
+              <span class="city">{{route.arrival}}</span>
+            </div>
+          </div>
+          
+          <div class="price-info">
+            <span class="price">{{route.price}} TND</span>
+            <span class="seats">Available seats: {{route.availableSeats}}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <div class="purchase-summary" *ngIf="selectedRoute">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Purchase Summary</mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="summary-details">
+          <div class="summary-row">
+            <span>Route:</span>
+            <span>{{selectedRoute.departure}} → {{selectedRoute.arrival}}</span>
+          </div>
+          <div class="summary-row">
+            <span>Date:</span>
+            <span>{{travelDate | date:'mediumDate'}}</span>
+          </div>
+          <div class="summary-row">
+            <span>Passengers:</span>
+            <span>{{passengerCount}}</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total Price:</span>
+            <span>{{totalPrice}} TND</span>
+          </div>
+        </div>
+      </mat-card-content>
+      
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="purchaseTicket()">
+          Purchase Ticket
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>
