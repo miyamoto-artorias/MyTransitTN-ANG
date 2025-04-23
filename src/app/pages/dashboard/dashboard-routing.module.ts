@@ -12,21 +12,12 @@ const routes: Routes = [
     title: 'Basic Dashboard',
     loadComponent: () => import('./basic/basic.component').then(c => c.BasicComponent)
   },
-  {
-    path: 'ecommerce',
-    title: 'Ecommerce Dashboard',
-    loadComponent: () => import('./ecommerce/ecommerce.component').then(c => c.EcommerceComponent)
-  },
-  {
-    path: 'finance',
-    title: 'Finance Dashboard',
-    loadComponent: () => import('./finance/finance.component').then(c => c.FinanceComponent)
-  },
-  {
-    path: 'explore',
-    title: 'Explore Dashboard',
-    loadComponent: () => import('./explore/explore.component').then(c => c.ExploreComponent)
-  }
+  {path: 'calender',
+    title: 'Calender Dashboard',
+    loadComponent: () => import('./calender/calender.component').then(c => c.CalenderComponent)},
+  {path: 'purchase-history',
+    title: 'Purchase History',    
+    loadComponent: () => import('./purchase-history/purchase-history.component').then(c => c.PurchaseHistoryComponent)},  
 ];
 
 @NgModule({

@@ -66,21 +66,27 @@ export class SidebarComponent implements OnInit {
         {
           key: uuid(),
           type: 'link',
-          name: 'Ecommerce',
-          link: '/pages/dashboard/ecommerce'
-        },
-        {
-          key: uuid(),
-          type: 'link',
-          name: 'Finance',
-          link: '/pages/dashboard/finance'
-        },
-        {
-          key: uuid(),
-          type: 'link',
-          name: 'Explore',
-          link: '/pages/dashboard/explore'
+          name: 'Calender',
+          link: '/pages/dashboard/calender'
         }
+      ]
+    },
+    {
+      key: 'user',
+      type: 'group',
+      name: 'user',
+      icon: 'dashboard',
+      children: [
+        {
+          key: uuid(),
+          type: 'link',
+          name: 'Basic',
+          link: '/pages/dashboard/basic'
+        },{
+          key: uuid(),  
+          type: 'link',
+          name: 'purchase history',      
+          link: '/pages/dashboard/purchase-history'}
       ]
     },
     
