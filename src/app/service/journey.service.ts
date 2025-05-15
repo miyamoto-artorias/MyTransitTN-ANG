@@ -46,11 +46,14 @@ export class JourneyService {
 
   private getHeaders(): HttpHeaders {
     const token = this.authService.getToken();
+    console.log('Auth token when building headers:', token ? 'exists' : 'missing');
     if (token) {
-      return new HttpHeaders({
+      const headers = new HttpHeaders({
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       });
+      console.log('Request headers:', headers.keys());
+      return headers;
     }
     return new HttpHeaders({
       'Content-Type': 'application/json'

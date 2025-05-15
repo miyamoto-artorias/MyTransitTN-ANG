@@ -95,6 +95,24 @@ export class BookJourneyComponent implements OnInit {
       return;
     }
     
+    // Debug - check if token exists and print it
+    const token = this.authService.getToken();
+    console.log('Token exists:', !!token);
+    if (token) {
+      // Check token expiration if possible by examining payload
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log('Token payload:', payload);
+        if (payload.exp) {
+          const expiryDate = new Date(payload.exp * 1000);
+          console.log('Token expires:', expiryDate);
+          console.log('Token expired:', expiryDate < new Date());
+        }
+      } catch (e) {
+        console.error('Error parsing token:', e);
+      }
+    }
+    
     this.loadLines();
   }
   
