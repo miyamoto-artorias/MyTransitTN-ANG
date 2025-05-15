@@ -1,1 +1,146 @@
-<p>user-journeys works!</p>
+<div class="p-4">
+  <div class="mb-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold">My Transit Journeys</h1>
+    <button mat-flat-button color="primary" (click)="refreshJourneys()" [disabled]="loading" matTooltip="Refresh journey list">
+      <mat-icon>refresh</mat-icon> Refresh
+    </button>
+  </div>
+  
+  <!-- Filters -->
+  <div class="mb-4">
+    <h2 class="text-lg font-medium mb-2">Filter by Status</h2>
+    <div class="flex flex-wrap gap-2">
+      <button mat-flat-button [color]="showPlanned ? 'primary' : undefined" (click)="toggleFilter('planned')">
+        Planned
+      </button>
+      <button mat-flat-button [color]="showInProgress ? 'accent' : undefined" (click)="toggleFilter('inProgress')">
+        In Progress
+      </button>
+      <button mat-flat-button [color]="showCompleted ? 'primary' : undefined" (click)="toggleFilter('completed')">
+        Completed
+      </button>
+      <button mat-flat-button [color]="showCancelled ? 'warn' : undefined" (click)="toggleFilter('cancelled')">
+        Cancelled
+      </button>
+    </div>
+  </div>
+  
+  <!-- Error message -->
+  @if (error) {
+    <div class="bg-red-50 text-red-700 p-4 rounded mb-4">
+      {{ error }}
+    </div>
+  }
+  
+  <!-- Loading indicator -->
+  @if (loading) {
+    <div class="flex justify-center items-center p-8">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span class="ml-4">Loading journeys...</span>
+    </div>
+  }
+  
+  <!-- No journeys message -->
+  @if (!loading && filteredJourneys.length === 0) {
+    <mat-card class="p-8 text-center">
+      <mat-icon class="text-5xl text-gray-400 mb-4">directions_subway</mat-icon>
+      <h3 class="text-xl mb-2">No journeys found</h3>
+      <p class="text-gray-600 mb-4">
+        @if (journeys.length > 0) {
+          No journeys match your current filters. Try changing your filter settings.
+        } @else {
+          You haven't booked any transit journeys yet. Start by booking a new journey!
+        }
+      </p>
+      <a mat-flat-button color="primary" routerLink="/pages/dashboard/book-journey">
+        Book a Journey
+      </a>
+    </mat-card>
+  }
+  
+  <!-- Journey table -->
+  @if (!loading && filteredJourneys.length > 0) {
+    <div class="overflow-x-auto">
+      <table mat-table [dataSource]="filteredJourneys" matSort (matSortChange)="sortData($event)" class="w-full">
+        
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+          <td mat-cell *matCellDef="let journey">{{ journey.id }}</td>
+        </ng-container>
+        
+        <!-- Line Column -->
+        <ng-container matColumnDef="line">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Line</th>
+          <td mat-cell *matCellDef="let journey">{{ journey.line.code }}</td>
+        </ng-container>
+        
+        <!-- Start Station Column -->
+        <ng-container matColumnDef="startStation">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Start Station</th>
+          <td mat-cell *matCellDef="let journey">{{ journey.startStation.name }}</td>
+        </ng-container>
+        
+        <!-- End Station Column -->
+        <ng-container matColumnDef="endStation">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>End Station</th>
+          <td mat-cell *matCellDef="let journey">{{ journey.endStation.name }}</td>
+        </ng-container>
+        
+        <!-- Start Time Column -->
+        <ng-container matColumnDef="startTime">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Start Time</th>
+          <td mat-cell *matCellDef="let journey">{{ journey.startTime | date:'medium' }}</td>
+        </ng-container>
+        
+        <!-- End Time Column -->
+        <ng-container matColumnDef="endTime">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>End Time</th>
+          <td mat-cell *matCellDef="let journey">
+            {{ journey.endTime ? (journey.endTime | date:'medium') : 'Not completed' }}
+          </td>
+        </ng-container>
+        
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+          <td mat-cell *matCellDef="let journey">
+            <button mat-button [color]="getStatusColor(journey.status)" disabled>
+              {{ journey.status }}
+            </button>
+          </td>
+        </ng-container>
+        
+        <!-- Distance Column -->
+        <ng-container matColumnDef="distance">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Distance</th>
+          <td mat-cell *matCellDef="let journey">{{ journey.distanceKm.toFixed(2) }} km</td>
+        </ng-container>
+        
+        <!-- Fare Column -->
+        <ng-container matColumnDef="fare">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Fare</th>
+          <td mat-cell *matCellDef="let journey">{{ journey.fare.toFixed(2) }} TND</td>
+        </ng-container>
+        
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let journey">
+            <button mat-icon-button color="primary" matTooltip="View journey details">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            @if (journey.status === 'PLANNED') {
+              <button mat-icon-button color="warn" matTooltip="Cancel journey">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            }
+          </td>
+        </ng-container>
+        
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns; let i = index; trackBy: trackByFn"></tr>
+      </table>
+    </div>
+  }
+</div>

@@ -1,1 +1,114 @@
-<p>book-journey works!</p>
+<div class="p-4">
+  <h1 class="text-2xl font-bold mb-6">Book a Journey</h1>
+  
+  <!-- Error message -->
+  @if (error) {
+    <div class="bg-red-50 text-red-700 p-4 rounded mb-4">
+      {{ error }}
+    </div>
+  }
+  
+  <!-- Loading indicator for lines -->
+  @if (linesLoading) {
+    <div class="flex justify-center items-center p-8">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span class="ml-4">Loading transit lines...</span>
+    </div>
+  }
+  
+  <!-- No lines available message -->
+  @if (!linesLoading && lines.length === 0) {
+    <mat-card class="p-8 text-center">
+      <mat-icon class="text-5xl text-gray-400 mb-4">error_outline</mat-icon>
+      <h3 class="text-xl mb-2">No Transit Lines Available</h3>
+      <p class="text-gray-600 mb-4">
+        There are no transit lines available for booking at the moment. Please try again later.
+      </p>
+      <button mat-flat-button color="primary" (click)="loadLines()">
+        <mat-icon>refresh</mat-icon> Retry
+      </button>
+    </mat-card>
+  }
+  
+  <!-- Booking form -->
+  @if (!linesLoading && lines.length > 0) {
+    <mat-card class="p-6">
+      <h2 class="text-xl font-medium mb-4">Plan Your Journey</h2>
+      
+      <form [formGroup]="bookingForm" (ngSubmit)="bookJourney()" class="flex flex-col gap-4">
+        <!-- Line selection -->
+        <mat-form-field>
+          <mat-label>Select Transit Line</mat-label>
+          <mat-select formControlName="lineId">
+            <mat-option [value]="">-- Select Line --</mat-option>
+            @for (line of lines; track line.id) {
+              <mat-option [value]="line.id">{{ line.code }}</mat-option>
+            }
+          </mat-select>
+          @if (bookingForm.get('lineId')?.hasError('required') && bookingForm.get('lineId')?.touched) {
+            <mat-error>Please select a transit line</mat-error>
+          }
+        </mat-form-field>
+        
+        <!-- Start station selection -->
+        <mat-form-field>
+          <mat-label>Select Start Station</mat-label>
+          <mat-select formControlName="startStationId">
+            <mat-option [value]="">-- Select Start Station --</mat-option>
+            @for (station of startStations; track station.id) {
+              <mat-option [value]="station.id">{{ station.name }}</mat-option>
+            }
+          </mat-select>
+          @if (bookingForm.get('startStationId')?.hasError('required') && bookingForm.get('startStationId')?.touched) {
+            <mat-error>Please select a start station</mat-error>
+          }
+        </mat-form-field>
+        
+        <!-- End station selection -->
+        <mat-form-field>
+          <mat-label>Select End Station</mat-label>
+          <mat-select formControlName="endStationId">
+            <mat-option [value]="">-- Select End Station --</mat-option>
+            @for (station of endStations; track station.id) {
+              <mat-option [value]="station.id">{{ station.name }}</mat-option>
+            }
+          </mat-select>
+          @if (bookingForm.get('endStationId')?.hasError('required') && bookingForm.get('endStationId')?.touched) {
+            <mat-error>Please select an end station</mat-error>
+          }
+        </mat-form-field>
+        
+        <!-- Instructions -->
+        <div class="bg-blue-50 p-4 rounded text-blue-700 text-sm mb-4">
+          <div class="flex items-start">
+            <mat-icon class="mr-2 text-blue-500">info</mat-icon>
+            <div>
+              <p class="font-medium">Journey Booking Instructions:</p>
+              <ul class="list-disc ml-6 mt-2">
+                <li>Select a transit line first.</li>
+                <li>Choose your start station.</li>
+                <li>Then select your destination station.</li>
+                <li>The fare will be calculated based on distance and line pricing.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Action buttons -->
+        <div class="flex justify-between mt-4">
+          <button mat-stroked-button type="button" routerLink="/pages/dashboard/user-journeys">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="bookingForm.invalid || bookingLoading">
+            @if (!bookingLoading) {
+              Book Journey
+            } @else {
+              <mat-spinner diameter="20" class="inline-block mr-2"></mat-spinner>
+              Booking...
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card>
+  }
+</div>

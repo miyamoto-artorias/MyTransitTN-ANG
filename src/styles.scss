@@ -12,7 +12,7 @@ html, body {
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
-/* Utility classes for map component */
+/* Utility classes for components */
 .flex {
   display: flex;
 }
@@ -27,6 +27,18 @@ html, body {
 
 .items-center {
   align-items: center;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-center {
+  justify-content: center;
 }
 
 .h-full {
@@ -57,6 +69,18 @@ html, body {
   padding: 1rem;
 }
 
+.p-6 {
+  padding: 1.5rem;
+}
+
+.p-8 {
+  padding: 2rem;
+}
+
+.p-3 {
+  padding: 0.75rem;
+}
+
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -64,6 +88,14 @@ html, body {
 
 .bg-gray-100 {
   background-color: #f3f4f6;
+}
+
+.bg-blue-50 {
+  background-color: #eff6ff;
+}
+
+.bg-red-50 {
+  background-color: #fef2f2;
 }
 
 .border-b {
@@ -82,8 +114,24 @@ html, body {
   margin-top: 0;
 }
 
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
 .mb-4 {
   margin-bottom: 1rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
 }
 
 .mb-3 {
@@ -94,8 +142,28 @@ html, body {
   margin-left: 0.25rem;
 }
 
+.ml-4 {
+  margin-left: 1rem;
+}
+
+.ml-6 {
+  margin-left: 1.5rem;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
 .text-xl {
   font-size: 1.25rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+}
+
+.text-5xl {
+  font-size: 3rem;
 }
 
 .text-sm {
@@ -114,8 +182,36 @@ html, body {
   font-weight: 500;
 }
 
+.font-bold {
+  font-weight: 700;
+}
+
 .text-gray-600 {
   color: #4b5563;
+}
+
+.text-gray-400 {
+  color: #9ca3af;
+}
+
+.text-red-600 {
+  color: #dc2626;
+}
+
+.text-red-700 {
+  color: #b91c1c;
+}
+
+.text-blue-500 {
+  color: #3b82f6;
+}
+
+.text-blue-700 {
+  color: #1d4ed8;
+}
+
+.text-center {
+  text-align: center;
 }
 
 .flex-1 {
@@ -134,21 +230,13 @@ html, body {
   gap: 0.75rem;
 }
 
+.gap-4 {
+  gap: 1rem;
+}
+
 .my-2 {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
-}
-
-.text-red-600 {
-  color: #dc2626;
-}
-
-.p-3 {
-  padding: 0.75rem;
-}
-
-.bg-red-50 {
-  background-color: #fef2f2;
 }
 
 .rounded {
@@ -159,6 +247,10 @@ html, body {
   display: none;
 }
 
+.inline-block {
+  display: inline-block;
+}
+
 .align-middle {
   vertical-align: middle;
 }
@@ -166,4 +258,12 @@ html, body {
 .w-full.max-w-xs {
   width: 100%;
   max-width: 20rem;
+}
+
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
+.list-disc {
+  list-style-type: disc;
 }
