@@ -13,8 +13,8 @@
       <button mat-flat-button [color]="showPlanned ? 'primary' : undefined" (click)="toggleFilter('planned')">
         Planned
       </button>
-      <button mat-flat-button [color]="showInProgress ? 'accent' : undefined" (click)="toggleFilter('inProgress')">
-        In Progress
+      <button mat-flat-button [color]="showPurchased ? 'accent' : undefined" (click)="toggleFilter('purchased')">
+        Purchased
       </button>
       <button mat-flat-button [color]="showCompleted ? 'primary' : undefined" (click)="toggleFilter('completed')">
         Completed
@@ -130,9 +130,23 @@
             <button mat-icon-button color="primary" matTooltip="View journey details">
               <mat-icon>visibility</mat-icon>
             </button>
+            
             @if (journey.status === 'PLANNED') {
-              <button mat-icon-button color="warn" matTooltip="Cancel journey">
+              <!-- Pay Button for PLANNED journeys -->
+              <button mat-icon-button color="accent" (click)="payForJourney(journey)" matTooltip="Pay for journey">
+                <mat-icon>payment</mat-icon>
+              </button>
+              
+              <!-- Cancel Button -->
+              <button mat-icon-button color="warn" (click)="cancelJourney(journey)" matTooltip="Cancel journey">
                 <mat-icon>cancel</mat-icon>
+              </button>
+            }
+            
+            @if (journey.status === 'PURCHASED') {
+              <!-- Mark as Completed Button for PURCHASED journeys -->
+              <button mat-icon-button color="primary" (click)="completeJourney(journey)" matTooltip="Mark as completed">
+                <mat-icon>done_all</mat-icon>
               </button>
             }
           </td>
@@ -143,4 +157,6 @@
       </table>
     </div>
   }
+  
+  <!-- Payment confirmation dialog will be added by Angular Material dialog service -->
 </div>

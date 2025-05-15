@@ -12,6 +12,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DatePipe } from '@angular/common';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { JourneyService, Journey } from '../../../service/journey.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { Router } from '@angular/router';
@@ -32,6 +34,8 @@ import { Router } from '@angular/router';
     MatProgressSpinnerModule,
     MatChipsModule,
     MatTooltipModule,
+    MatSnackBarModule,
+    MatDialogModule,
     DatePipe
   ],
   templateUrl: './user-journeys.component.html'
@@ -40,6 +44,8 @@ export class UserJourneysComponent implements OnInit {
   private journeyService = inject(JourneyService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
   
   journeys: Journey[] = [];
   filteredJourneys: Journey[] = [];
@@ -49,7 +55,7 @@ export class UserJourneysComponent implements OnInit {
   
   // Filter flags
   showPlanned = true;
-  showInProgress = true;
+  showPurchased = true;
   showCompleted = true;
   showCancelled = true;
 
@@ -82,7 +88,7 @@ export class UserJourneysComponent implements OnInit {
   applyFilters(): void {
     this.filteredJourneys = this.journeys.filter(journey => {
       if (journey.status === 'PLANNED' && !this.showPlanned) return false;
-      if (journey.status === 'IN_PROGRESS' && !this.showInProgress) return false;
+      if (journey.status === 'PURCHASED' && !this.showPurchased) return false;
       if (journey.status === 'COMPLETED' && !this.showCompleted) return false;
       if (journey.status === 'CANCELLED' && !this.showCancelled) return false;
       return true;
@@ -94,8 +100,8 @@ export class UserJourneysComponent implements OnInit {
       case 'planned':
         this.showPlanned = !this.showPlanned;
         break;
-      case 'inProgress':
-        this.showInProgress = !this.showInProgress;
+      case 'purchased':
+        this.showPurchased = !this.showPurchased;
         break;
       case 'completed':
         this.showCompleted = !this.showCompleted;
@@ -144,7 +150,7 @@ export class UserJourneysComponent implements OnInit {
   getStatusColor(status: string): string {
     switch (status) {
       case 'PLANNED': return 'primary';
-      case 'IN_PROGRESS': return 'accent';
+      case 'PURCHASED': return 'accent';
       case 'COMPLETED': return 'success';
       case 'CANCELLED': return 'warn';
       default: return '';
@@ -157,5 +163,85 @@ export class UserJourneysComponent implements OnInit {
   
   trackByFn(index: number, item: Journey): number {
     return item.id;
+  }
+
+  // New methods for journey actions
+  payForJourney(journey: Journey): void {
+    // First check if we need to display a specific warning about balance
+    this.loading = true;
+    
+    // Get the current user's balance (This could be from a UserService if available)
+    // For now, let's just proceed with the confirmation
+
+    // Confirm payment with user
+    if (confirm(`Are you sure you want to pay ${journey.fare.toFixed(2)} TND for this journey?\n\nJourney details:\nFrom: ${journey.startStation.name}\nTo: ${journey.endStation.name}\nLine: ${journey.line.code}`)) {
+      this.journeyService.payForJourney(journey.id).subscribe({
+        next: (response) => {
+          this.snackBar.open('Payment successful! Your journey is now purchased.', 'Close', { 
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
+          this.refreshJourneys();
+        },
+        error: (error) => {
+          console.error('Payment error:', error);
+          
+          // Enhanced error message handling
+          let errorMsg = error.message;
+          
+          // Check for specific error cases
+          if (errorMsg.includes('Insufficient balance')) {
+            errorMsg = 'You don\'t have enough balance to pay for this journey. Please top up your account.';
+          } else if (errorMsg.includes('already been paid')) {
+            errorMsg = 'This journey has already been paid for. Refreshing your journey list...';
+            setTimeout(() => this.refreshJourneys(), 1500);
+          }
+          
+          this.snackBar.open(`Payment failed: ${errorMsg}`, 'Close', { 
+            duration: 5000, 
+            panelClass: ['error-snackbar']
+          });
+          this.loading = false;
+        }
+      });
+    } else {
+      this.loading = false;
+    }
+  }
+
+  cancelJourney(journey: Journey): void {
+    if (confirm('Are you sure you want to cancel this journey?')) {
+      this.loading = true;
+      
+      this.journeyService.cancelJourney(journey.id).subscribe({
+        next: (updatedJourney) => {
+          this.snackBar.open('Journey cancelled successfully', 'Close', { duration: 3000 });
+          this.refreshJourneys();
+        },
+        error: (error) => {
+          console.error('Cancel error:', error);
+          this.snackBar.open(`Failed to cancel journey: ${error.message}`, 'Close', { duration: 5000 });
+          this.loading = false;
+        }
+      });
+    }
+  }
+
+  completeJourney(journey: Journey): void {
+    if (confirm('Are you sure you want to mark this journey as completed?')) {
+      this.loading = true;
+      
+      this.journeyService.completeJourney(journey.id).subscribe({
+        next: (updatedJourney) => {
+          this.snackBar.open('Journey marked as completed', 'Close', { duration: 3000 });
+          this.refreshJourneys();
+        },
+        error: (error) => {
+          console.error('Complete error:', error);
+          this.snackBar.open(`Failed to complete journey: ${error.message}`, 'Close', { duration: 5000 });
+          this.loading = false;
+        }
+      });
+    }
   }
 }

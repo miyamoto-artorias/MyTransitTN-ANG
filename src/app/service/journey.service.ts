@@ -22,7 +22,7 @@ export interface Journey {
   endStation: Station;
   startTime: string;
   endTime: string | null;
-  status: 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  status: 'PLANNED' | 'PURCHASED' | 'COMPLETED' | 'CANCELLED';
   distanceKm: number;
   fare: number;
   line: Line;
@@ -87,6 +87,42 @@ export class JourneyService {
     );
   }
 
+  startJourney(journeyId: number): Observable<Journey> {
+    return this.http.put<Journey>(`${this.apiUrl}/journeys/${journeyId}/start`, {}, {
+      headers: this.getHeaders()
+    }).pipe(
+      tap(journey => console.log('Journey started, ID:', journey.id)),
+      catchError(this.handleError('startJourney'))
+    );
+  }
+
+  completeJourney(journeyId: number): Observable<Journey> {
+    return this.http.put<Journey>(`${this.apiUrl}/journeys/${journeyId}/complete`, {}, {
+      headers: this.getHeaders()
+    }).pipe(
+      tap(journey => console.log('Journey completed, ID:', journey.id)),
+      catchError(this.handleError('completeJourney'))
+    );
+  }
+
+  cancelJourney(journeyId: number): Observable<Journey> {
+    return this.http.put<Journey>(`${this.apiUrl}/journeys/${journeyId}/cancel`, {}, {
+      headers: this.getHeaders()
+    }).pipe(
+      tap(journey => console.log('Journey cancelled, ID:', journey.id)),
+      catchError(this.handleError('cancelJourney'))
+    );
+  }
+
+  payForJourney(journeyId: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/payments/journey/${journeyId}`, {}, {
+      headers: this.getHeaders()
+    }).pipe(
+      tap(response => console.log('Journey payment successful:', response)),
+      catchError(this.handleError('payForJourney'))
+    );
+  }
+
   private handleError(operation = 'operation') {
     return (error: HttpErrorResponse): Observable<never> => {
       console.error(`${operation} failed:`, error);
@@ -100,9 +136,27 @@ export class JourneyService {
         // Server-side error
         if (typeof error.error === 'object' && error.error !== null) {
           // Try to extract the error message from the response
-          const apiError = error.error as ApiError;
-          errorMessage = apiError.error || `Server returned code ${error.status}`;
-          console.error('API Error:', apiError);
+          if (error.error.error) {
+            // Direct error message from server
+            errorMessage = error.error.error;
+          } else if (error.error.message) {
+            // Some APIs use message field
+            errorMessage = error.error.message;
+          } else {
+            // Fallback
+            errorMessage = `Server returned code ${error.status}`;
+          }
+          console.error('API Error details:', error.error);
+        } else if (typeof error.error === 'string') {
+          // Sometimes error comes as a string
+          try {
+            // Try to parse it as JSON
+            const parsed = JSON.parse(error.error);
+            errorMessage = parsed.error || parsed.message || `Server error: ${error.error}`;
+          } catch (e) {
+            // If it's not valid JSON, use the string directly
+            errorMessage = error.error || `Server returned code ${error.status}`;
+          }
         } else {
           errorMessage = `Server returned code ${error.status}, message: ${error.message}`;
         }
