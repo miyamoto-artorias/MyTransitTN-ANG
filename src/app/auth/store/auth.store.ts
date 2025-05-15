@@ -1,10 +1,8 @@
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 
 export interface User {
-  id: string;
   email: string;
-  name: string;
-  role: string;
+  // Other properties would be fetched from a user endpoint or included in JWT
 }
 
 type AuthState = {
