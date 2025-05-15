@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { Line } from './map.service';
 import { AuthService } from '../auth/services/auth.service';
 
@@ -35,6 +36,13 @@ export interface JourneyRequest {
   lineId: number;
 }
 
+export interface ApiError {
+  error: string;
+  path?: string;
+  status?: number;
+  timestamp?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -63,12 +71,53 @@ export class JourneyService {
   getUserJourneys(): Observable<Journey[]> {
     return this.http.get<Journey[]>(`${this.apiUrl}/journeys`, {
       headers: this.getHeaders()
-    });
+    }).pipe(
+      tap(journeys => console.log('Fetched journeys:', journeys.length)),
+      catchError(this.handleError('getUserJourneys'))
+    );
   }
 
   bookJourney(journeyRequest: JourneyRequest): Observable<Journey> {
+    console.log('Booking journey with request:', journeyRequest);
     return this.http.post<Journey>(`${this.apiUrl}/journeys`, journeyRequest, {
       headers: this.getHeaders()
-    });
+    }).pipe(
+      tap(journey => console.log('Journey booked successfully, ID:', journey.id)),
+      catchError(this.handleError('bookJourney'))
+    );
+  }
+
+  private handleError(operation = 'operation') {
+    return (error: HttpErrorResponse): Observable<never> => {
+      console.error(`${operation} failed:`, error);
+
+      let errorMessage = 'An error occurred';
+      
+      if (error.error instanceof ErrorEvent) {
+        // Client-side error
+        errorMessage = `Error: ${error.error.message}`;
+      } else {
+        // Server-side error
+        if (typeof error.error === 'object' && error.error !== null) {
+          // Try to extract the error message from the response
+          const apiError = error.error as ApiError;
+          errorMessage = apiError.error || `Server returned code ${error.status}`;
+          console.error('API Error:', apiError);
+        } else {
+          errorMessage = `Server returned code ${error.status}, message: ${error.message}`;
+        }
+        
+        // Log request details for debugging
+        console.error('Request that caused the error:', {
+          url: error.url,
+          headers: error.headers,
+          status: error.status,
+          statusText: error.statusText
+        });
+      }
+
+      // Let the app keep running by returning an error Observable
+      return throwError(() => new Error(errorMessage));
+    };
   }
 } 

@@ -189,14 +189,16 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
                   
                   if (startBtn) {
                     (startBtn as HTMLElement).addEventListener('click', () => {
-                      this.selectStartStation(station);
+                      // Direct call to handle Start station selection
+                      this.setStartStation(station);
                       marker.closePopup();
                     });
                   }
                   
                   if (endBtn) {
                     (endBtn as HTMLElement).addEventListener('click', () => {
-                      this.selectEndStation(station);
+                      // Direct call to handle End station selection
+                      this.setEndStation(station);
                       marker.closePopup();
                     });
                   }
@@ -242,6 +244,92 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
   
+  // New simpler methods to handle station selection
+  setStartStation(station: Station): void {
+    console.log('Setting start station:', station.name);
+    this.selectedStartStation = station;
+    this.bookingForm.get('startStationId')?.setValue(station.id);
+    
+    // Try to find a compatible line if end station is already selected
+    if (this.selectedEndStation) {
+      this.findCompatibleLine(this.selectedStartStation, this.selectedEndStation);
+    }
+    
+    this.updateStationMarkers();
+  }
+  
+  setEndStation(station: Station): void {
+    console.log('Setting end station:', station.name);
+    this.selectedEndStation = station;
+    this.bookingForm.get('endStationId')?.setValue(station.id);
+    
+    // Try to find a compatible line if start station is already selected
+    if (this.selectedStartStation) {
+      this.findCompatibleLine(this.selectedStartStation, this.selectedEndStation);
+    }
+    
+    this.updateStationMarkers();
+  }
+  
+  // Find a line that contains both stations
+  findCompatibleLine(startStation: Station, endStation: Station): boolean {
+    console.log('Finding compatible line between', startStation.name, 'and', endStation.name);
+    
+    // Check each line to see if both stations are on it
+    for (const line of this.lines) {
+      const startIndex = line.stations.findIndex(s => s.id === startStation.id);
+      const endIndex = line.stations.findIndex(s => s.id === endStation.id);
+      
+      // If both stations are on this line
+      if (startIndex !== -1 && endIndex !== -1) {
+        console.log('Found compatible line:', line.code);
+        this.selectedLine = line;
+        this.bookingForm.get('lineId')?.setValue(line.id);
+        
+        // Update map to show just this line, but don't clear selections
+        // Preserve existing stations by not calling displayAllLinesAndStations() here
+        this.visibleLines.clear();
+        this.visibleLines.add(line.id);
+        
+        // Update the display without resetting stations
+        this.updateStationVisibility();
+        this.highlightSelectedRoute();
+        
+        // If stations are in reverse order, show a notification but allow it
+        if (startIndex > endIndex) {
+          this.snackBar.open('Note: Traveling in reverse direction on line ' + line.code, 'OK', { 
+            duration: 3000 
+          });
+        }
+        
+        return true;
+      }
+    }
+    
+    // No compatible line found
+    this.snackBar.open('No common line found for these stations', 'Close', { duration: 3000 });
+    return false;
+  }
+  
+  // New helper method to update station visibility without reset
+  private updateStationVisibility(): void {
+    if (!this.map) return;
+    
+    // Update polyline visibility based on selected lines
+    Object.entries(this.linePolylines).forEach(([lineId, polylines]) => {
+      const visible = this.visibleLines.has(Number(lineId));
+      polylines.forEach(line => {
+        if (visible) {
+          if (!this.map!.hasLayer(line)) this.map!.addLayer(line);
+        } else {
+          if (this.map!.hasLayer(line)) this.map!.removeLayer(line);
+        }
+      });
+    });
+    
+    // Don't remove or reset station markers here
+  }
+  
   toggleLineVisibility(lineId: number): void {
     if (this.visibleLines.has(lineId)) {
       this.visibleLines.delete(lineId);
@@ -265,75 +353,6 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
       lines.forEach(line => line.remove());
     });
     this.linePolylines = {};
-  }
-  
-  selectStartStation(station: Station): void {
-    this.selectedStartStation = station;
-    this.bookingForm.get('startStationId')?.setValue(station.id);
-    
-    // Find the line that contains this station
-    const line = this.findLineForStation(station.id);
-    if (line && line.id !== this.bookingForm.get('lineId')?.value) {
-      this.bookingForm.get('lineId')?.setValue(line.id);
-      this.selectedLine = line;
-    }
-    
-    // Reset end station if it's before the start station
-    if (this.selectedEndStation && this.selectedLine) {
-      const startIndex = this.selectedLine.stations.findIndex(s => s.id === station.id);
-      // Store the ID in a local variable after null check to avoid TypeScript error
-      const endStationId = this.selectedEndStation.id;
-      const endIndex = this.selectedLine.stations.findIndex(s => s.id === endStationId);
-      
-      if (endIndex <= startIndex) {
-        this.selectedEndStation = null;
-        this.bookingForm.get('endStationId')?.setValue('');
-      }
-    }
-    
-    // Update the map markers to show the selection
-    this.updateStationMarkers();
-  }
-  
-  selectEndStation(station: Station): void {
-    // Only allow selecting an end station if a start station has been selected
-    if (!this.selectedStartStation) {
-      this.snackBar.open('Please select a start station first', 'Close', { duration: 3000 });
-      return;
-    }
-    
-    // Find the line that contains the start station
-    const startLine = this.findLineForStation(this.selectedStartStation.id);
-    const endLine = this.findLineForStation(station.id);
-    
-    if (!startLine || startLine.id !== endLine?.id) {
-      this.snackBar.open('Start and end stations must be on the same line', 'Close', { duration: 3000 });
-      return;
-    }
-    
-    // Check if end station comes after start station in the line's stations array
-    const startIndex = startLine.stations.findIndex(s => s.id === this.selectedStartStation?.id);
-    const endIndex = startLine.stations.findIndex(s => s.id === station.id);
-    
-    if (endIndex <= startIndex) {
-      this.snackBar.open('End station must be after start station on the line', 'Close', { duration: 3000 });
-      return;
-    }
-    
-    this.selectedEndStation = station;
-    this.bookingForm.get('endStationId')?.setValue(station.id);
-    
-    // Update the map markers to show the selection
-    this.updateStationMarkers();
-  }
-  
-  private findLineForStation(stationId: number): Line | null {
-    for (const line of this.lines) {
-      if (line.stations.some(station => station.id === stationId)) {
-        return line;
-      }
-    }
-    return null;
   }
   
   private updateStationMarkers(): void {
@@ -373,14 +392,14 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
               
               if (startBtn) {
                 (startBtn as HTMLElement).addEventListener('click', () => {
-                  this.selectStartStation(station);
+                  this.setStartStation(station);
                   marker.closePopup();
                 });
               }
               
               if (endBtn) {
                 (endBtn as HTMLElement).addEventListener('click', () => {
-                  this.selectEndStation(station);
+                  this.setEndStation(station);
                   marker.closePopup();
                 });
               }
@@ -422,35 +441,50 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
       const startIndex = stations.findIndex(s => s.id === startStationId);
       const endIndex = stations.findIndex(s => s.id === endStationId);
       
-      if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
-        // Highlight route segments between start and end
-        for (let i = startIndex; i < endIndex; i++) {
-          const currentStation = stations[i];
-          const nextStation = stations[i + 1];
-          
-          // Find the polyline connecting these two stations
-          const polyline = this.linePolylines[lineId].find(line => {
-            const latLngs = line.getLatLngs() as L.LatLng[];
-            const pointA = latLngs[0];
-            const pointB = latLngs[1];
-            
-            return (
-              (Math.abs(pointA.lat - currentStation.latitude) < 0.0001 && 
-               Math.abs(pointA.lng - currentStation.longitude) < 0.0001 &&
-               Math.abs(pointB.lat - nextStation.latitude) < 0.0001 && 
-               Math.abs(pointB.lng - nextStation.longitude) < 0.0001) || 
-              (Math.abs(pointB.lat - currentStation.latitude) < 0.0001 && 
-               Math.abs(pointB.lng - currentStation.longitude) < 0.0001 &&
-               Math.abs(pointA.lat - nextStation.latitude) < 0.0001 && 
-               Math.abs(pointA.lng - nextStation.longitude) < 0.0001)
-            );
-          });
-          
-          if (polyline) {
-            polyline.setStyle({ weight: 8, opacity: 1 });
+      // Check if both stations are on this line
+      if (startIndex !== -1 && endIndex !== -1) {
+        // Forward journey (startIndex < endIndex)
+        if (startIndex < endIndex) {
+          for (let i = startIndex; i < endIndex; i++) {
+            const currentStation = stations[i];
+            const nextStation = stations[i + 1];
+            this.highlightSegment(lineId, currentStation, nextStation);
+          }
+        } 
+        // Reverse journey (startIndex > endIndex)
+        else if (startIndex > endIndex) {
+          for (let i = startIndex; i > endIndex; i--) {
+            const currentStation = stations[i];
+            const prevStation = stations[i - 1];
+            this.highlightSegment(lineId, currentStation, prevStation);
           }
         }
       }
+    }
+  }
+  
+  // Helper method to highlight a segment between two stations
+  private highlightSegment(lineId: number, stationA: Station, stationB: Station): void {
+    const polyline = this.linePolylines[lineId]?.find(line => {
+      const latLngs = line.getLatLngs() as L.LatLng[];
+      const pointA = latLngs[0];
+      const pointB = latLngs[1];
+      
+      // Check if the polyline connects the two stations (in either direction)
+      return (
+        (Math.abs(pointA.lat - stationA.latitude) < 0.0001 && 
+         Math.abs(pointA.lng - stationA.longitude) < 0.0001 &&
+         Math.abs(pointB.lat - stationB.latitude) < 0.0001 && 
+         Math.abs(pointB.lng - stationB.longitude) < 0.0001) || 
+        (Math.abs(pointB.lat - stationA.latitude) < 0.0001 && 
+         Math.abs(pointB.lng - stationA.longitude) < 0.0001 &&
+         Math.abs(pointA.lat - stationB.latitude) < 0.0001 && 
+         Math.abs(pointA.lng - stationB.longitude) < 0.0001)
+      );
+    });
+    
+    if (polyline) {
+      polyline.setStyle({ weight: 8, opacity: 1, color: '#FF4500' });
     }
   }
   
@@ -489,9 +523,49 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   
   bookJourney(): void {
+    // Case: No selections made
+    if (!this.selectedStartStation && !this.selectedEndStation) {
+      this.snackBar.open('Please select start and end stations', 'Close', { duration: 3000 });
+      return;
+    }
+
+    // Case: Only end station selected
+    if (!this.selectedStartStation && this.selectedEndStation) {
+      this.snackBar.open('Please select a start station', 'Close', { duration: 3000 });
+      return;
+    }
+
+    // Case: Only start station selected
+    if (this.selectedStartStation && !this.selectedEndStation) {
+      this.snackBar.open('Please select an end station', 'Close', { duration: 3000 });
+      return;
+    }
+    
+    // Check if form valid
     if (this.bookingForm.invalid) {
       this.snackBar.open('Please complete all journey details before booking', 'Close', { duration: 3000 });
       return;
+    }
+    
+    // If both stations selected but no line, try to find a common line
+    if (!this.selectedLine && this.selectedStartStation && this.selectedEndStation) {
+      let foundLine = false;
+      for (const line of this.lines) {
+        const startIndex = line.stations.findIndex(s => s.id === this.selectedStartStation?.id);
+        const endIndex = line.stations.findIndex(s => s.id === this.selectedEndStation?.id);
+        
+        if (startIndex !== -1 && endIndex !== -1) {
+          this.selectedLine = line;
+          this.bookingForm.get('lineId')?.setValue(line.id);
+          foundLine = true;
+          break;
+        }
+      }
+      
+      if (!foundLine) {
+        this.snackBar.open('No common line found for these stations', 'Close', { duration: 3000 });
+        return;
+      }
     }
     
     const startStationId = this.bookingForm.get('startStationId')?.value;
@@ -528,14 +602,14 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
             this.authService.logout();
             this.router.navigate(['/login']);
           } else if (error.status === 400) {
-            const message = error.error?.message || 'Invalid journey details. Please check and try again.';
+            const message = error.error?.message || error.error?.error || 'Invalid journey details. Please check and try again.';
             this.snackBar.open(message, 'Close', {
               duration: 5000
             });
           } else if (error.status === 0) {
             this.error = 'Could not connect to the server. Please check your connection and try again.';
           } else {
-            this.error = `Failed to book journey: ${error.error?.message || error.statusText || 'Unknown error'}`;
+            this.error = `Failed to book journey: ${error.error?.message || error.error?.error || error.statusText || 'Unknown error'}`;
           }
           
           throw error;
