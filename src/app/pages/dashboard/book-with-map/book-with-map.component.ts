@@ -73,7 +73,7 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor() {
     // Initialize form
     this.bookingForm = this.fb.group({
-      lineId: ['', Validators.required],
+      lineId: [''],
       startStationId: ['', Validators.required],
       endStationId: ['', Validators.required]
     });
@@ -82,8 +82,6 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.bookingForm.get('lineId')?.valueChanges.subscribe(lineId => {
       if (lineId) {
         this.onLineSelectedFromForm(lineId);
-      } else {
-        this.resetStationSelections();
       }
     });
   }
@@ -333,23 +331,17 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     
-    // Second attempt: Find a path requiring a line change
-    // This part would check if there's a station that belongs to both lines
-    // For simplicity, we'll just tell the user to select stations on the same line
-    this.snackBar.open('No direct line connects these stations. Please select stations on the same line.', 'Close', { duration: 5000 });
-    
-    // Preserve both stations but don't change the line selection
-    // Update UI to show all lines, so the user can see their options
+    // If we reach here, the stations are on different lines - that's okay with multi-line journey feature
     this.selectedLine = null;
     this.bookingForm.get('lineId')?.setValue('');
     
-    // Show all lines to help the user select a valid route
+    // Show all lines to help visualize the potential route
     this.lines.forEach(line => this.visibleLines.add(line.id));
-    
-    // Update station markers without clearing selections
     this.updateStationVisibility();
     
-    return false;
+    // No notification needed - the system handles multi-line journeys automatically
+    
+    return true; // Return true to allow the journey to be booked
   }
   
   // New helper method to update station visibility without reset
@@ -486,18 +478,16 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
               }
               
               if (clearBtn) {
-                (clearBtn as HTMLElement).addEventListener('click', () => {
-                  if (this.selectedStartStation && id === this.selectedStartStation.id) {
-                    this.selectedStartStation = null;
-                    this.bookingForm.get('startStationId')?.setValue('');
-                  }
-                  if (this.selectedEndStation && id === this.selectedEndStation.id) {
-                    this.selectedEndStation = null;
-                    this.bookingForm.get('endStationId')?.setValue('');
-                  }
-                  marker.closePopup();
-                  this.updateStationMarkers();
-                });
+                if (this.selectedStartStation && id === this.selectedStartStation.id) {
+                  this.selectedStartStation = null;
+                  this.bookingForm.get('startStationId')?.setValue('');
+                }
+                if (this.selectedEndStation && id === this.selectedEndStation.id) {
+                  this.selectedEndStation = null;
+                  this.bookingForm.get('endStationId')?.setValue('');
+                }
+                marker.closePopup();
+                this.updateStationMarkers();
               }
             }
           }
@@ -525,37 +515,43 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     });
     
-    // If we have both start and end stations and they're on the same line
-    if (this.selectedStartStation && this.selectedEndStation && this.selectedLine) {
-      const lineId = this.selectedLine.id;
-      const stations = this.selectedLine.stations;
-      
-      // Store IDs in local variables after null check to avoid TypeScript errors
-      const startStationId = this.selectedStartStation.id;
-      const endStationId = this.selectedEndStation.id;
-      
-      const startIndex = stations.findIndex(s => s.id === startStationId);
-      const endIndex = stations.findIndex(s => s.id === endStationId);
-      
-      // Check if both stations are on this line
-      if (startIndex !== -1 && endIndex !== -1) {
-        // Forward journey (startIndex < endIndex)
-        if (startIndex < endIndex) {
-          for (let i = startIndex; i < endIndex; i++) {
-            const currentStation = stations[i];
-            const nextStation = stations[i + 1];
-            this.highlightSegment(lineId, currentStation, nextStation);
-          }
-        } 
-        // Reverse journey (startIndex > endIndex)
-        else if (startIndex > endIndex) {
-          for (let i = startIndex; i > endIndex; i--) {
-            const currentStation = stations[i];
-            const prevStation = stations[i - 1];
-            this.highlightSegment(lineId, currentStation, prevStation);
+    // Skip route highlighting for multi-line journeys (when selectedLine is null)
+    // But still ensure both stations remain selected
+    if (this.selectedStartStation && this.selectedEndStation) {
+      // If we have a selected line, highlight the route on that line
+      if (this.selectedLine) {
+        const lineId = this.selectedLine.id;
+        const stations = this.selectedLine.stations;
+        
+        // Store IDs in local variables after null check to avoid TypeScript errors
+        const startStationId = this.selectedStartStation.id;
+        const endStationId = this.selectedEndStation.id;
+        
+        const startIndex = stations.findIndex(s => s.id === startStationId);
+        const endIndex = stations.findIndex(s => s.id === endStationId);
+        
+        // Check if both stations are on this line
+        if (startIndex !== -1 && endIndex !== -1) {
+          // Forward journey (startIndex < endIndex)
+          if (startIndex < endIndex) {
+            for (let i = startIndex; i < endIndex; i++) {
+              const currentStation = stations[i];
+              const nextStation = stations[i + 1];
+              this.highlightSegment(lineId, currentStation, nextStation);
+            }
+          } 
+          // Reverse journey (startIndex > endIndex)
+          else if (startIndex > endIndex) {
+            for (let i = startIndex; i > endIndex; i--) {
+              const currentStation = stations[i];
+              const prevStation = stations[i - 1];
+              this.highlightSegment(lineId, currentStation, prevStation);
+            }
           }
         }
       }
+      // For multi-line journeys, we don't highlight a specific route
+      // but we ensure both stations remain selected visually
     }
   }
   
@@ -586,10 +582,6 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
   
   onLineSelectedFromForm(lineId: number): void {
     this.selectedLine = this.lines.find(line => line.id === lineId) || null;
-    
-    // Don't reset station selections when a line is chosen from the dropdown
-    // Only reset if specifically requested
-    // this.resetStationSelections();
     
     // Update map to highlight the selected line
     if (this.selectedLine) {
@@ -650,48 +642,24 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     
-    // Check if form valid
-    if (this.bookingForm.invalid) {
-      this.snackBar.open('Please complete all journey details before booking', 'Close', { duration: 3000 });
+    const startStationId = this.selectedStartStation?.id;
+    const endStationId = this.selectedEndStation?.id;
+    
+    if (!startStationId || !endStationId) {
+      this.snackBar.open('Please select both start and end stations', 'Close', { duration: 3000 });
       return;
     }
     
-    // If both stations selected but no line, try to find a common line
-    if (!this.selectedLine && this.selectedStartStation && this.selectedEndStation) {
-      let foundLine = false;
-      for (const line of this.lines) {
-        const startIndex = line.stations.findIndex(s => s.id === this.selectedStartStation?.id);
-        const endIndex = line.stations.findIndex(s => s.id === this.selectedEndStation?.id);
-        
-        if (startIndex !== -1 && endIndex !== -1) {
-          this.selectedLine = line;
-          this.bookingForm.get('lineId')?.setValue(line.id);
-          foundLine = true;
-          break;
-        }
-      }
-      
-      if (!foundLine) {
-        this.snackBar.open('No common line found for these stations', 'Close', { duration: 3000 });
-        return;
-      }
-    }
-    
-    const startStationId = this.bookingForm.get('startStationId')?.value;
-    const endStationId = this.bookingForm.get('endStationId')?.value;
-    const lineId = this.bookingForm.get('lineId')?.value;
-    
-    // Validate values before sending
-    if (!startStationId || !endStationId || !lineId) {
-      this.snackBar.open('Please complete all journey details before booking', 'Close', { duration: 3000 });
-      return;
-    }
-    
+    // Create the journey request
     const journeyRequest: JourneyRequest = {
-      startStationId: Number(startStationId),
-      endStationId: Number(endStationId),
-      lineId: Number(lineId)
+      startStationId: startStationId,
+      endStationId: endStationId
     };
+    
+    // If a specific line is selected, include it in the request
+    if (this.selectedLine) {
+      journeyRequest.lineId = this.selectedLine.id;
+    }
     
     this.error = '';
     this.bookingLoading = true;

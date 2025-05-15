@@ -16,6 +16,14 @@ export interface User {
   email: string;
 }
 
+export interface JourneySegment {
+  startStation: Station;
+  endStation: Station;
+  line: Line;
+  distanceKm: number;
+  isTransfer: boolean;
+}
+
 export interface Journey {
   id: number;
   startStation: Station;
@@ -25,15 +33,17 @@ export interface Journey {
   status: 'PLANNED' | 'PURCHASED' | 'COMPLETED' | 'CANCELLED';
   distanceKm: number;
   fare: number;
-  line: Line;
+  primaryLine: Line;
   user: User;
   error: string | null;
+  isMultiLineJourney?: boolean;
+  segments?: JourneySegment[];
 }
 
 export interface JourneyRequest {
   startStationId: number;
   endStationId: number;
-  lineId: number;
+  lineId?: number;
 }
 
 export interface ApiError {

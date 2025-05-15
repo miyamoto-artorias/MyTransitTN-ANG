@@ -72,7 +72,13 @@
         <!-- Line Column -->
         <ng-container matColumnDef="line">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Line</th>
-          <td mat-cell *matCellDef="let journey">{{ journey.line.code }}</td>
+          <td mat-cell *matCellDef="let journey">
+            @if (journey.isMultiLineJourney) {
+              <span class="text-xs px-2 py-1 bg-purple-100 text-purple-800 rounded-full">Multi-line</span>
+            } @else {
+              {{ journey.primaryLine?.code || 'N/A' }}
+            }
+          </td>
         </ng-container>
         
         <!-- Start Station Column -->
@@ -159,4 +165,59 @@
   }
   
   <!-- Payment confirmation dialog will be added by Angular Material dialog service -->
+  
+  <!-- Add this below the main journey table -->
+  @if (!loading && filteredJourneys.length > 0) {
+    <div class="mt-4">
+      <h2 class="text-lg font-medium mb-2">Multi-line Journey Details</h2>
+      
+      @for (journey of filteredJourneys; track journey.id) {
+        @if (journey.isMultiLineJourney && journey.segments && journey.segments.length > 0) {
+          <mat-expansion-panel class="mb-2">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                Journey #{{ journey.id }}: {{ journey.startStation.name }} → {{ journey.endStation.name }}
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ journey.segments.length }} segments | {{ journey.distanceKm.toFixed(2) }} km
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            
+            <div class="overflow-x-auto">
+              <table class="min-w-full border-collapse">
+                <thead>
+                  <tr class="bg-gray-100">
+                    <th class="border p-2 text-left">Segment</th>
+                    <th class="border p-2 text-left">Line</th>
+                    <th class="border p-2 text-left">From</th>
+                    <th class="border p-2 text-left">To</th>
+                    <th class="border p-2 text-left">Distance</th>
+                    <th class="border p-2 text-left">Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (segment of journey.segments; track $index) {
+                    <tr [class.bg-gray-50]="segment.isTransfer">
+                      <td class="border p-2">{{ $index + 1 }}</td>
+                      <td class="border p-2">{{ segment.line.code }}</td>
+                      <td class="border p-2">{{ segment.startStation.name }}</td>
+                      <td class="border p-2">{{ segment.endStation.name }}</td>
+                      <td class="border p-2">{{ segment.distanceKm.toFixed(2) }} km</td>
+                      <td class="border p-2">
+                        @if (segment.isTransfer) {
+                          <span class="text-xs px-2 py-1 bg-orange-100 text-orange-800 rounded-full">Transfer</span>
+                        } @else {
+                          <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">Travel</span>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </mat-expansion-panel>
+        }
+      }
+    </div>
+  }
 </div>

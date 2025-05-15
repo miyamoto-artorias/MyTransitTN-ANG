@@ -14,6 +14,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { DatePipe } from '@angular/common';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { JourneyService, Journey } from '../../../service/journey.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { Router } from '@angular/router';
@@ -36,6 +37,7 @@ import { Router } from '@angular/router';
     MatTooltipModule,
     MatSnackBarModule,
     MatDialogModule,
+    MatExpansionModule,
     DatePipe
   ],
   templateUrl: './user-journeys.component.html'
@@ -125,7 +127,13 @@ export class UserJourneysComponent implements OnInit {
       const isAsc = sort.direction === 'asc';
       switch (sort.active) {
         case 'id': return this.compare(a.id, b.id, isAsc);
-        case 'line': return this.compare(a.line.code, b.line.code, isAsc);
+        case 'line': 
+          // Handle multi-line journeys for sorting
+          if (a.isMultiLineJourney && !b.isMultiLineJourney) return isAsc ? 1 : -1;
+          if (!a.isMultiLineJourney && b.isMultiLineJourney) return isAsc ? -1 : 1;
+          if (a.isMultiLineJourney && b.isMultiLineJourney) return 0;
+          // Otherwise compare line codes
+          return this.compare(a.primaryLine?.code || '', b.primaryLine?.code || '', isAsc);
         case 'startStation': return this.compare(a.startStation.name, b.startStation.name, isAsc);
         case 'endStation': return this.compare(a.endStation.name, b.endStation.name, isAsc);
         case 'startTime': return this.compare(new Date(a.startTime).getTime(), new Date(b.startTime).getTime(), isAsc);
@@ -174,7 +182,9 @@ export class UserJourneysComponent implements OnInit {
     // For now, let's just proceed with the confirmation
 
     // Confirm payment with user
-    if (confirm(`Are you sure you want to pay ${journey.fare.toFixed(2)} TND for this journey?\n\nJourney details:\nFrom: ${journey.startStation.name}\nTo: ${journey.endStation.name}\nLine: ${journey.line.code}`)) {
+    const lineInfo = journey.isMultiLineJourney ? 'Multiple Lines' : journey.primaryLine?.code || 'N/A';
+    
+    if (confirm(`Are you sure you want to pay ${journey.fare.toFixed(2)} TND for this journey?\n\nJourney details:\nFrom: ${journey.startStation.name}\nTo: ${journey.endStation.name}\nLine: ${lineInfo}`)) {
       this.journeyService.payForJourney(journey.id).subscribe({
         next: (response) => {
           this.snackBar.open('Payment successful! Your journey is now purchased.', 'Close', { 
