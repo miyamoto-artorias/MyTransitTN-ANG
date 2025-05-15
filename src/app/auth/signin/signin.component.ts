@@ -8,7 +8,6 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { HorizontalDividerComponent, LogoComponent } from '@elementar-ui/components';
 import { AuthService, LoginRequest } from '../services/auth.service';
 import { finalize } from 'rxjs';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-signin',
@@ -24,8 +23,7 @@ import { NgIf } from '@angular/common';
     ReactiveFormsModule,
     MatCheckbox,
     HorizontalDividerComponent,
-    LogoComponent,
-    NgIf
+    LogoComponent
   ],
   templateUrl: './signin.component.html',
   styleUrl: './signin.component.scss'

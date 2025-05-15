@@ -12,6 +12,11 @@ const routes: Routes = [
     title: 'Basic Dashboard',
     loadComponent: () => import('./basic/basic.component').then(c => c.BasicComponent)
   },
+  {
+    path: 'journey-map',
+    title: 'Journey Map',
+    loadComponent: () => import('./journey-map/journey-map.component').then(c => c.JourneyMapComponent)
+  },
   {path: 'calender',
     title: 'Calender Dashboard',
     loadComponent: () => import('./calender/calender.component').then(c => c.CalenderComponent)},

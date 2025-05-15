@@ -1,1 +1,33 @@
-<p>journey-map works!</p>
+<div class="flex flex-col h-full w-full min-h-[600px]">
+  <div class="p-4 bg-gray-100 border-b border-gray-200 z-10">
+    <h2 class="mt-0 mb-4 text-xl font-semibold">Transit Lines</h2>
+    
+    @if (loading) {
+      <div class="flex items-center gap-2 my-2">
+        <mat-spinner diameter="30"></mat-spinner>
+        <span>Loading...</span>
+      </div>
+    }
+    
+    @if (error) {
+      <div class="text-red-600 my-2 p-3 bg-red-50 rounded">
+        {{ error }}
+      </div>
+    }
+    
+    @if (lines.length > 0) {
+      <mat-form-field class="w-full max-w-xs">
+        <mat-label>Select Line</mat-label>
+        <mat-select [(ngModel)]="selectedLineId" (selectionChange)="selectLine($event.value)">
+          @for (line of lines; track line.id) {
+            <mat-option [value]="line.id">{{ line.code }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    } @else if (!loading) {
+      <p>No transit lines available</p>
+    }
+  </div>
+  
+  <div id="map" class="flex-1 min-h-[500px] w-full"></div>
+</div>

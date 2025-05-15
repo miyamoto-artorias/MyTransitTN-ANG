@@ -66,6 +66,12 @@ export class SidebarComponent implements OnInit {
         {
           key: uuid(),
           type: 'link',
+          name: 'Journey Map',
+          link: '/pages/dashboard/journey-map'
+        },
+        {
+          key: uuid(),
+          type: 'link',
           name: 'Calendar',
           link: '/pages/dashboard/calendar'
         }

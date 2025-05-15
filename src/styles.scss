@@ -1,1 +1,112 @@
 @use "../projects/components/styles/themes/default";
+
+/* Base styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Map styles */
+.leaflet-marker-icon {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+/* Utility classes for map component */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.min-h-\[600px\] {
+  min-height: 600px;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.bg-gray-100 {
+  background-color: #f3f4f6;
+}
+
+.border-b {
+  border-bottom-width: 1px;
+}
+
+.border-gray-200 {
+  border-color: #e5e7eb;
+}
+
+.z-10 {
+  z-index: 10;
+}
+
+.mt-0 {
+  margin-top: 0;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.min-h-\[500px\] {
+  min-height: 500px;
+}
+
+.flex.items-center {
+  align-items: center;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.my-2 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.text-red-600 {
+  color: #dc2626;
+}
+
+.p-3 {
+  padding: 0.75rem;
+}
+
+.bg-red-50 {
+  background-color: #fef2f2;
+}
+
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.w-full.max-w-xs {
+  width: 100%;
+  max-width: 20rem;
+}
