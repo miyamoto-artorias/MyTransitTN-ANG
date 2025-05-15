@@ -66,14 +66,21 @@ export class SidebarComponent implements OnInit {
         {
           key: uuid(),
           type: 'link',
-          name: 'Journey Map',
-          link: '/pages/dashboard/journey-map'
+          name: 'Book Journey',
+          link: '/pages/dashboard/book-journey'
         },
         {
           key: uuid(),
           type: 'link',
-          name: 'Calendar',
-          link: '/pages/dashboard/calendar'
+          name: 'Journey Map',
+          link: '/pages/dashboard/journey-map'
+        }
+        ,
+        {
+          key: uuid(),
+          type: 'link',
+          name: 'Purchase History',
+          link: '/pages/dashboard/purchase-history'
         }
       ]
     },
@@ -93,7 +100,7 @@ export class SidebarComponent implements OnInit {
           key: uuid(),
           type: 'link',
           name: 'Purchase History',
-          link: '/pages/user/purchase-history'
+          link: '/pages/dashboard/purchase-history'
         }
       ]
     },

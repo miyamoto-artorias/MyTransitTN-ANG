@@ -13,13 +13,16 @@ const routes: Routes = [
     loadComponent: () => import('./basic/basic.component').then(c => c.BasicComponent)
   },
   {
+    path:'book-journey',
+    title: 'Book Journey',
+    loadComponent: () => import('./book-journey/book-journey.component').then(c => c.BookJourneyComponent)
+  },
+
+  {
     path: 'journey-map',
     title: 'Journey Map',
     loadComponent: () => import('./journey-map/journey-map.component').then(c => c.JourneyMapComponent)
   },
-  {path: 'calender',
-    title: 'Calender Dashboard',
-    loadComponent: () => import('./calender/calender.component').then(c => c.CalenderComponent)},
   {path: 'purchase-history',
     title: 'Purchase History',    
     loadComponent: () => import('./purchase-history/purchase-history.component').then(c => c.PurchaseHistoryComponent)},  
