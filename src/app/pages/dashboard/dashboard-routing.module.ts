@@ -22,7 +22,12 @@ const routes: Routes = [
     title: 'Book Journey',
     loadComponent: () => import('./book-journey/book-journey.component').then(c => c.BookJourneyComponent)
   },
-
+  {
+    path:'book-with-map',
+    title: 'Book with Map',
+    loadComponent: () => import('./book-with-map/book-with-map.component').then(c => c.BookWithMapComponent)
+  }
+,
   {
     path: 'journey-map',
     title: 'Journey Map',

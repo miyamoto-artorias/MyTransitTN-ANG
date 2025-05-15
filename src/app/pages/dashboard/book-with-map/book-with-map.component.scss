@@ -1,0 +1,68 @@
+/* Map container styling */
+#map {
+  width: 100%;
+  min-height: 500px;
+  border-radius: 4px;
+  z-index: 1;
+}
+
+/* Custom styling for station popup buttons */
+:host ::ng-deep {
+  .leaflet-popup-content {
+    min-width: 150px;
+    
+    button {
+      display: block;
+      width: 100%;
+      margin: 5px 0;
+      padding: 8px;
+      background-color: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      
+      &:hover {
+        background-color: #e0e0e0;
+      }
+      
+      &.select-start-btn:hover {
+        background-color: #e8f5e9;
+        border-color: #4caf50;
+      }
+      
+      &.select-end-btn:hover {
+        background-color: #ffebee;
+        border-color: #f44336;
+      }
+    }
+    
+    .text-green-600 {
+      color: #4caf50;
+    }
+    
+    .text-red-600 {
+      color: #f44336;
+    }
+  }
+  
+  /* Style for selected route line */
+  .highlighted-route {
+    stroke-dasharray: 5;
+    animation: dash 10s linear infinite;
+  }
+}
+
+@media (max-width: 768px) {
+  .flex-col {
+    flex-direction: column !important;
+  }
+  
+  #map, .booking-sidebar {
+    width: 100% !important;
+  }
+  
+  #map {
+    min-height: 300px;
+  }
+}
