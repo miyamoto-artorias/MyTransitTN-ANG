@@ -1,1 +1,56 @@
-<p>map works!</p>
+<div class="flex flex-col h-full w-full min-h-[600px]">
+  <!-- Header Section -->
+  <div class="p-4 bg-gray-100 border-b border-gray-200 z-10">
+    <h2 class="mt-0 mb-4 text-xl font-semibold">Transit Network Map</h2>
+    
+    @if (loading) {
+      <div class="flex items-center gap-2 my-2">
+        <mat-spinner diameter="30"></mat-spinner>
+        <span>Loading transit network...</span>
+      </div>
+    }
+    
+    @if (error) {
+      <div class="text-red-600 my-2 p-3 bg-red-50 rounded">
+        {{ error }}
+      </div>
+    }
+    
+    <!-- Line Legend and Controls -->
+    @if (lines.length > 0) {
+      <div class="flex items-center gap-3 flex-wrap mb-3">
+        <span class="text-sm font-medium">Transit Lines:</span>
+        @for (line of lineColors; track line.id) {
+          <div class="flex items-center">
+            <button mat-flat-button 
+                    class="h-8 px-2"
+                    [style.backgroundColor]="visibleLines.has(line.id) ? line.color : '#f5f5f5'"
+                    [style.color]="visibleLines.has(line.id) ? 'white' : '#555'"
+                    (click)="toggleLineVisibility(line.id)"
+                    matTooltip="Click to toggle visibility">
+              {{ line.code }}
+              <mat-icon class="ml-1 text-sm h-4 w-4">
+                {{ visibleLines.has(line.id) ? 'visibility' : 'visibility_off' }}
+              </mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+      
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-xs text-gray-600">
+          <mat-icon class="text-sm h-4 w-4 align-middle">info</mat-icon>
+          Stations at connection points may serve multiple lines.
+        </span>
+      </div>
+    } @else if (!loading) {
+      <p>No transit lines available</p>
+    }
+  </div>
+  
+  <!-- Map Container -->
+  <div id="map" class="flex-1 min-h-[500px] w-full"></div>
+  
+  <!-- Station Information Tooltip (will be shown on hover in the map) -->
+  <div #tooltip class="hidden"></div>
+</div>
