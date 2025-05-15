@@ -152,6 +152,13 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
   displayAllLinesAndStations(): void {
     if (!this.map) return;
     
+    console.log('displayAllLinesAndStations called - preserving selections:', 
+      this.selectedStartStation?.name, this.selectedEndStation?.name);
+    
+    // Store current selections before clearing
+    const currentStartStation = this.selectedStartStation;
+    const currentEndStation = this.selectedEndStation;
+    
     // Clear any previous data
     this.clearMap();
     
@@ -242,6 +249,21 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
       const bounds = L.latLngBounds(allLatLngs);
       this.map.fitBounds(bounds, { padding: [50, 50] });
     }
+    
+    // Restore selections after redrawing the map
+    this.selectedStartStation = currentStartStation;
+    this.selectedEndStation = currentEndStation;
+    
+    // Make sure form values are consistent with our object selections
+    if (this.selectedStartStation) {
+      this.bookingForm.get('startStationId')?.setValue(this.selectedStartStation.id);
+    }
+    if (this.selectedEndStation) {
+      this.bookingForm.get('endStationId')?.setValue(this.selectedEndStation.id);
+    }
+    
+    // Update station markers to show selected status
+    this.updateStationMarkers();
   }
   
   // New simpler methods to handle station selection
@@ -275,7 +297,13 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
   findCompatibleLine(startStation: Station, endStation: Station): boolean {
     console.log('Finding compatible line between', startStation.name, 'and', endStation.name);
     
-    // Check each line to see if both stations are on it
+    // Check if the stations are the same
+    if (startStation.id === endStation.id) {
+      this.snackBar.open('Start and end stations cannot be the same', 'Close', { duration: 3000 });
+      return false;
+    }
+    
+    // First attempt: find a single line containing both stations
     for (const line of this.lines) {
       const startIndex = line.stations.findIndex(s => s.id === startStation.id);
       const endIndex = line.stations.findIndex(s => s.id === endStation.id);
@@ -287,7 +315,6 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.bookingForm.get('lineId')?.setValue(line.id);
         
         // Update map to show just this line, but don't clear selections
-        // Preserve existing stations by not calling displayAllLinesAndStations() here
         this.visibleLines.clear();
         this.visibleLines.add(line.id);
         
@@ -306,8 +333,22 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     
-    // No compatible line found
-    this.snackBar.open('No common line found for these stations', 'Close', { duration: 3000 });
+    // Second attempt: Find a path requiring a line change
+    // This part would check if there's a station that belongs to both lines
+    // For simplicity, we'll just tell the user to select stations on the same line
+    this.snackBar.open('No direct line connects these stations. Please select stations on the same line.', 'Close', { duration: 5000 });
+    
+    // Preserve both stations but don't change the line selection
+    // Update UI to show all lines, so the user can see their options
+    this.selectedLine = null;
+    this.bookingForm.get('lineId')?.setValue('');
+    
+    // Show all lines to help the user select a valid route
+    this.lines.forEach(line => this.visibleLines.add(line.id));
+    
+    // Update station markers without clearing selections
+    this.updateStationVisibility();
+    
     return false;
   }
   
@@ -327,7 +368,15 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     });
     
-    // Don't remove or reset station markers here
+    // Make sure all station markers remain on the map, even if their lines are hidden
+    Object.entries(this.stationMarkers).forEach(([stationId, marker]) => {
+      if (!this.map!.hasLayer(marker)) {
+        this.map!.addLayer(marker);
+      }
+    });
+    
+    // Update the station markers to show their selection status
+    this.updateStationMarkers();
   }
   
   toggleLineVisibility(lineId: number): void {
@@ -337,8 +386,8 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.visibleLines.add(lineId);
     }
     
-    // Re-render map with updated line visibility
-    this.displayAllLinesAndStations();
+    // Update line visibility without fully resetting the map
+    this.updateStationVisibility();
   }
   
   clearMap(): void {
@@ -363,17 +412,48 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
       
       if (!station) return;
       
+      // Create a custom icon to visually distinguish selected stations
+      if (this.selectedStartStation && id === this.selectedStartStation.id) {
+        marker.setIcon(L.divIcon({
+          className: 'custom-marker',
+          html: `<div style="background-color: #4CAF50; border-radius: 50%; width: 24px; height: 24px; border: 2px solid white;"></div>`,
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
+        }));
+        marker.setZIndexOffset(1000);
+      } else if (this.selectedEndStation && id === this.selectedEndStation.id) {
+        marker.setIcon(L.divIcon({
+          className: 'custom-marker',
+          html: `<div style="background-color: #F44336; border-radius: 50%; width: 24px; height: 24px; border: 2px solid white;"></div>`,
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
+        }));
+        marker.setZIndexOffset(1000);
+      } else {
+        // Reset to default marker
+        marker.setIcon(L.icon({
+          iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+          shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41]
+        }));
+        marker.setZIndexOffset(0);
+      }
+      
       // Update popup content
       let popupContent = `<b>${station.name}</b><br>`;
       
       if (this.selectedStartStation && id === this.selectedStartStation.id) {
-        popupContent += `<strong class="text-green-600">Selected as START</strong><br>`;
-        marker.setZIndexOffset(1000); // Make start marker appear on top
+        popupContent += `<strong style="color: #4CAF50;">Selected as START</strong><br>`;
+        // Allow changing selection to END if start is already selected
+        popupContent += `<button class="select-end-btn">Change to End</button><br>`;
+        popupContent += `<button class="clear-selection-btn">Clear Selection</button>`;
       } else if (this.selectedEndStation && id === this.selectedEndStation.id) {
-        popupContent += `<strong class="text-red-600">Selected as END</strong><br>`;
-        marker.setZIndexOffset(1000); // Make end marker appear on top
+        popupContent += `<strong style="color: #F44336;">Selected as END</strong><br>`;
+        // Allow changing selection to START if end is already selected
+        popupContent += `<button class="select-start-btn">Change to Start</button><br>`;
+        popupContent += `<button class="clear-selection-btn">Clear Selection</button>`;
       } else {
-        marker.setZIndexOffset(0);
         popupContent += `<button class="select-start-btn">Select as Start</button><br>
                          <button class="select-end-btn">Select as End</button>`;
       }
@@ -389,6 +469,7 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
             if (container) {
               const startBtn = container.querySelector('.select-start-btn');
               const endBtn = container.querySelector('.select-end-btn');
+              const clearBtn = container.querySelector('.clear-selection-btn');
               
               if (startBtn) {
                 (startBtn as HTMLElement).addEventListener('click', () => {
@@ -401,6 +482,21 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
                 (endBtn as HTMLElement).addEventListener('click', () => {
                   this.setEndStation(station);
                   marker.closePopup();
+                });
+              }
+              
+              if (clearBtn) {
+                (clearBtn as HTMLElement).addEventListener('click', () => {
+                  if (this.selectedStartStation && id === this.selectedStartStation.id) {
+                    this.selectedStartStation = null;
+                    this.bookingForm.get('startStationId')?.setValue('');
+                  }
+                  if (this.selectedEndStation && id === this.selectedEndStation.id) {
+                    this.selectedEndStation = null;
+                    this.bookingForm.get('endStationId')?.setValue('');
+                  }
+                  marker.closePopup();
+                  this.updateStationMarkers();
                 });
               }
             }
@@ -491,18 +587,27 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
   onLineSelectedFromForm(lineId: number): void {
     this.selectedLine = this.lines.find(line => line.id === lineId) || null;
     
-    // Reset station selections
-    this.resetStationSelections();
+    // Don't reset station selections when a line is chosen from the dropdown
+    // Only reset if specifically requested
+    // this.resetStationSelections();
     
     // Update map to highlight the selected line
     if (this.selectedLine) {
       // Make only the selected line visible
       this.visibleLines.clear();
       this.visibleLines.add(this.selectedLine.id);
-      this.displayAllLinesAndStations();
+      
+      // Use updateStationVisibility instead of displayAllLinesAndStations
+      // to preserve selection state
+      this.updateStationVisibility();
       
       // Zoom to the line's stations
       this.zoomToLine(this.selectedLine);
+      
+      // If we have both stations selected, highlight the route
+      if (this.selectedStartStation && this.selectedEndStation) {
+        this.highlightSelectedRoute();
+      }
     }
   }
   
@@ -515,11 +620,15 @@ export class BookWithMapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   
   private resetStationSelections(): void {
+    console.log('Resetting station selections');
     this.selectedStartStation = null;
     this.selectedEndStation = null;
     this.bookingForm.get('startStationId')?.setValue('');
     this.bookingForm.get('endStationId')?.setValue('');
-    this.displayAllLinesAndStations(); // Redraw map to clear selections
+    
+    // Use updateStationVisibility instead of displayAllLinesAndStations
+    // This will update the visual state without redrawing the entire map
+    this.updateStationMarkers();
   }
   
   bookJourney(): void {
