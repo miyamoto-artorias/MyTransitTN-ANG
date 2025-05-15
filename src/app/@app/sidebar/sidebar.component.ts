@@ -80,12 +80,6 @@ export class SidebarComponent implements OnInit {
           type: 'link',
           name: 'Book with Map',
           link: '/pages/dashboard/book-with-map'
-        },
-        {
-          key: uuid(),
-          type: 'link',
-          name: 'Journey Map',
-          link: '/pages/dashboard/journey-map'
         }
         ,
         {
@@ -93,12 +87,6 @@ export class SidebarComponent implements OnInit {
           type: 'link',
           name: 'User Journeys',
           link: '/pages/dashboard/user-journeys'
-        },
-        {
-          key: uuid(),
-          type: 'link',
-          name: 'Purchase History',
-          link: '/pages/dashboard/purchase-history'
         }
       ]
     },
