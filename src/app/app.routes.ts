@@ -7,6 +7,10 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'login',
+    loadComponent: () => import('./auth/signin/signin.component').then(c => c.SigninComponent)
+  },
+  {
     path: 'pages',
     loadChildren: () => import('./pages/pages.module').then(m => m.PagesModule)
   },
