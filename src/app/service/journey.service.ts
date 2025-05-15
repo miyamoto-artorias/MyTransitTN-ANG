@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Line } from './map.service';
+import { AuthService } from '../auth/services/auth.service';
 
 export interface Station {
   id: number;
@@ -39,14 +40,32 @@ export interface JourneyRequest {
 })
 export class JourneyService {
   private apiUrl = 'http://localhost:8080/api';
+  private authService = inject(AuthService);
 
   constructor(private http: HttpClient) { }
 
+  private getHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    if (token) {
+      return new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      });
+    }
+    return new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+  }
+
   getUserJourneys(): Observable<Journey[]> {
-    return this.http.get<Journey[]>(`${this.apiUrl}/journeys`);
+    return this.http.get<Journey[]>(`${this.apiUrl}/journeys`, {
+      headers: this.getHeaders()
+    });
   }
 
   bookJourney(journeyRequest: JourneyRequest): Observable<Journey> {
-    return this.http.post<Journey>(`${this.apiUrl}/journeys`, journeyRequest);
+    return this.http.post<Journey>(`${this.apiUrl}/journeys`, journeyRequest, {
+      headers: this.getHeaders()
+    });
   }
 } 

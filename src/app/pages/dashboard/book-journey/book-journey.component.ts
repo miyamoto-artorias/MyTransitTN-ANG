@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 import { RouterModule, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,6 +13,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { MapService, Line, Station } from '../../../service/map.service';
 import { JourneyService, JourneyRequest } from '../../../service/journey.service';
 import { AuthService } from '../../../auth/services/auth.service';
+import { catchError, finalize } from 'rxjs';
 
 @Component({
   selector: 'app-book-journey',
@@ -143,39 +144,76 @@ export class BookJourneyComponent implements OnInit {
       return;
     }
     
+    const startStationId = this.bookingForm.get('startStationId')?.value;
+    const endStationId = this.bookingForm.get('endStationId')?.value;
+    const lineId = this.bookingForm.get('lineId')?.value;
+    
+    // Validate values before sending
+    if (!startStationId || !endStationId || !lineId) {
+      this.snackBar.open('Please complete all journey details before booking', 'Close', {
+        duration: 5000
+      });
+      return;
+    }
+    
     const journeyRequest: JourneyRequest = {
-      startStationId: this.bookingForm.get('startStationId')?.value,
-      endStationId: this.bookingForm.get('endStationId')?.value,
-      lineId: this.bookingForm.get('lineId')?.value
+      startStationId: Number(startStationId),
+      endStationId: Number(endStationId),
+      lineId: Number(lineId)
     };
     
+    console.log('Sending journey request:', journeyRequest);
+    
+    this.error = '';
     this.bookingLoading = true;
-    this.journeyService.bookJourney(journeyRequest).subscribe({
-      next: (journey) => {
-        this.bookingLoading = false;
-        this.snackBar.open('Journey booked successfully!', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'top'
-        });
-        
-        // Reset the form
-        this.bookingForm.reset();
-        
-        // Redirect to user journeys page after a short delay
-        setTimeout(() => {
-          this.router.navigate(['/pages/dashboard/user-journeys']);
-        }, 1000);
-      },
-      error: (err) => {
-        console.error('Error booking journey:', err);
-        this.bookingLoading = false;
-        this.snackBar.open('Failed to book journey. Please try again.', 'Close', {
-          duration: 5000,
-          horizontalPosition: 'center',
-          verticalPosition: 'top'
-        });
-      }
-    });
+    
+    this.journeyService.bookJourney(journeyRequest)
+      .pipe(
+        finalize(() => {
+          this.bookingLoading = false;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          console.error('Error booking journey:', error);
+          console.error('Error details:', error.error);
+          
+          // More detailed error handling
+          if (error.status === 401 || error.status === 403) {
+            this.snackBar.open('Authentication failed. Please log in again.', 'Close', {
+              duration: 5000
+            });
+            this.authService.logout();
+            this.router.navigate(['/login']);
+          } else if (error.status === 400) {
+            const message = error.error?.message || 'Invalid journey details. Please check and try again.';
+            this.snackBar.open(message, 'Close', {
+              duration: 5000
+            });
+          } else if (error.status === 0) {
+            this.error = 'Could not connect to the server. Please check your connection and try again.';
+          } else {
+            this.error = `Failed to book journey: ${error.error?.message || error.statusText || 'Unknown error'}`;
+          }
+          
+          throw error;
+        })
+      )
+      .subscribe({
+        next: (journey) => {
+          this.snackBar.open('Journey booked successfully!', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+          
+          // Reset the form
+          this.bookingForm.reset();
+          
+          // Redirect to user journeys page after a short delay
+          setTimeout(() => {
+            this.router.navigate(['/pages/dashboard/user-journeys']);
+          }, 1000);
+        },
+        error: () => {} // Errors already handled in catchError
+      });
   }
 }
