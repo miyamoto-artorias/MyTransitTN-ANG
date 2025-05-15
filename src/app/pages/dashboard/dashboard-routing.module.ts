@@ -13,6 +13,11 @@ const routes: Routes = [
     loadComponent: () => import('./basic/basic.component').then(c => c.BasicComponent)
   },
   {
+    path:'map',
+    title: 'Map',
+    loadComponent: () => import('./map/map.component').then(c => c.MapComponent)
+  },
+  {
     path:'book-journey',
     title: 'Book Journey',
     loadComponent: () => import('./book-journey/book-journey.component').then(c => c.BookJourneyComponent)
@@ -22,6 +27,11 @@ const routes: Routes = [
     path: 'journey-map',
     title: 'Journey Map',
     loadComponent: () => import('./journey-map/journey-map.component').then(c => c.JourneyMapComponent)
+  },
+  {
+    path:'user-journeys',
+    title: 'User Journeys',
+    loadComponent: () => import('./user-journeys/user-journeys.component').then(c => c.UserJourneysComponent)
   },
   {path: 'purchase-history',
     title: 'Purchase History',    
